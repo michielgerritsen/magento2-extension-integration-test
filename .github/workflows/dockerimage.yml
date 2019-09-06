@@ -1,0 +1,20 @@
+name: Docker Image CI
+on:
+  push:
+    branches:
+    - build
+
+jobs:
+
+  build:
+ 
+    runs-on: ubuntu-latest
+ 
+    steps:
+    - uses: actions/checkout@v1
+    - name: Build the Docker image
+      run: >
+        docker build magento
+        -t michielgerritsen/magento-project-community-edition:php71-magento232 
+        --build-arg MAGENTO_VERSION=2.3.2 
+        --build-arg PHP_VERSION=php71-fpm
