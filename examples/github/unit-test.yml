@@ -1,0 +1,41 @@
+name: Unit Tests
+
+# This makes sure that the tests are run on every push. See this page for more options:
+# https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions
+on: push
+
+jobs:
+  build:
+    strategy:
+      # This Matrix will run the tests on PHP 7.0, 7.1 and 7.2 and on Magento 2.2.11 and 2.3.5-p1.
+      # Magento 2.3.5-p1 requires PHP 7.1 and higher, so PHP 7.0 is disabled for this version.
+      # Magento 2.2.11 supports PHP up to version 7.1, so PHP 7.2 is disabled for this version.
+      matrix:
+        PHP_VERSION: [php7-fpm, php71-fpm, php72-fpm]
+        MAGENTO_VERSION: [2.2.11, 2.3.4]
+        exclude:
+          - PHP_VERSION: php7-fpm
+            MAGENTO_VERSION: 2.3.4
+          - PHP_VERSION: php72-fpm
+            MAGENTO_VERSION: 2.2.11
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+
+      # Download the correct Docker image with the correct Magento & PHP version for this specific run.
+      - name: Start Docker
+        run: docker run --detach --name magento-project-community-edition michielgerritsen/magento-project-community-edition:${{ matrix.PHP_VERSION }}-magento${{ matrix.MAGENTO_VERSION }}
+
+      # If your code is not in the root but in a subdirecty you need to change this command.
+      # Example: If your code is in the `src` folder then you need to do this:
+      # run: docker cp $(pwd)/src magento-project-community-edition:/data/extensions/
+      - name: Upload our code into the docker container
+        run: docker cp $(pwd) magento-project-community-edition:/data/extensions/
+
+      # Replace <VENDOR> and <MODULE> with the name in your `composer.json`.
+      - name: Install the extension in Magento
+        run: docker exec magento-project-community-edition composer require <VENDOR>/<MODULE>:@dev
+
+      # Only the tests in your repository will be run, the default Magento tests are not included in this.
+      - name: Run tests
+        run: docker exec magento-project-community-edition bash -c "vendor/bin/phpunit extensions/workdir/Test/Unit"
