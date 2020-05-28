@@ -14,6 +14,9 @@ ReflectionException: Class Magento\Catalog\Api\Data\ProductExtensionInterfaceFac
 Special thanks to Fooman for providing a Magento 2 mirror that does not requires any authentication:
 - https://store.fooman.co.nz/blog/no-authentication-needed-magento-2-mirror.html
 
+Docker Hub link:
+- https://hub.docker.com/r/michielgerritsen/magento-project-community-edition
+
 # How to use in your own project
 
 In theory this can be used in any pipeline, but i've only integrated this in Github Actions at this moment.
