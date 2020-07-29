@@ -20,7 +20,7 @@
         <ini name="xdebug.max_nesting_level" value="200"/>
     </php>
     <filter>
-        <whitelist addUncoveredFilesFromWhiteList="true">
+        <whitelist>
             <directory suffix=".php">../../../extensions/workdir/*</directory>
             <exclude>
                 <directory>../../../extensions/workdir/Test</directory>
