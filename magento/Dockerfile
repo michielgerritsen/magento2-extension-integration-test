@@ -39,7 +39,7 @@ RUN apt-get update --fix-missing && \
     php bin/magento setup:di:compile && \
     mkdir -p extensions && \
 #    if (( $(php -r 'echo version_compare(PHP_VERSION, "7.2", "ge") && version_compare(PHP_VERSION, "7.4", "lt") ? "true" : "false";') = "true" )); then composer require reach-digital/magento2-test-framework; fi && \
-    composer config repositories.dev-extensions path extensions/*
+    composer config repositories.dev-extensions '{"type": "path", "url": "extensions/*", "options": {"symlink": true}}'
 
 COPY patches/bundle-2684_dotmailer_integration_tests-2020-08-04-04-31-22.patch bundle-2684_dotmailer_integration_tests-2020-08-04-04-31-22.patch
 COPY templates/install-config-mysql.php dev/tests/integration/etc/
