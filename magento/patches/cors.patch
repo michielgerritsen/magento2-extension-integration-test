@@ -1,0 +1,17 @@
+diff --git a/phpserver/router.php b/phpserver/router.php
+index 06c23ecd..3946c2de 100644
+--- a/phpserver/router.php
++++ b/phpserver/router.php
+@@ -1,4 +1,12 @@
+ <?php
++header('Access-Control-Allow-Origin: *');
++header('Access-Control-Allow-Methods: *');
++header('Access-Control-Allow-Headers: DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Content-Range,Range,Authorization');
++
++if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
++    http_response_code(200);
++    exit;
++}
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
