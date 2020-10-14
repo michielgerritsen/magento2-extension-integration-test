@@ -21,6 +21,7 @@ RUN apt update --fix-missing && \
     apt install -y elasticsearch mysql-server mysql-client && \
     rm -rf /var/lib/apt/lists/* && \
     echo 'memory_limit = 2048M' >> /usr/local/etc/php/conf.d/memory-limit-php.ini && \
+    echo 'max_execution_time = 300' >> /usr/local/etc/php/conf.d/memory-limit-php.ini && \
     rm /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && \
     curl -o magento.zip https://repo-magento-mirror.fooman.co.nz/dist/magento/$MAGENTO_TYPE/magento-$MAGENTO_TYPE-$MAGENTO_VERSION.zip && \
     unzip -q magento.zip -d . && \
@@ -36,13 +37,15 @@ RUN apt update --fix-missing && \
     sleep 5 && \
     mysql -u root -e 'CREATE DATABASE `magento`;' && \
     mysql -u root -e 'CREATE DATABASE `magento-test`;' && \
-    mysql -u root -e "CREATE USER 'magento'@'localhost' IDENTIFIED BY 'password';" && \
-    mysql -u root -e "CREATE USER 'magento-test'@'localhost' IDENTIFIED BY 'password';" && \
-    mysql -u root -e "GRANT ALL PRIVILEGES ON * . * TO 'magento'@'localhost';" && \
-    mysql -u root -e "GRANT ALL PRIVILEGES ON * . * TO 'magento-test'@'localhost';" && \
+    mysql -u root -e "CREATE USER 'magento'@'%' IDENTIFIED BY 'password';" && \
+    mysql -u root -e "CREATE USER 'magento-test'@'%' IDENTIFIED BY 'password';" && \
+    mysql -u root -e "GRANT ALL PRIVILEGES ON * . * TO 'magento'@'%';" && \
+    mysql -u root -e "GRANT ALL PRIVILEGES ON * . * TO 'magento-test'@'%';" && \
     sleep 5 && \
-    php bin/magento setup:install --backend-frontname=admin --session-save=db --db-host=127.0.0.1 --db-name=magento --db-user=magento --db-password=password --base-url=http://localhost --timezone=Europe/Amsterdam --currency=EUR --admin-user=exampleuser --admin-password=examplepassword123 --admin-email=user@example.com --admin-firstname=Example --admin-lastname=Example --use-rewrites=1 && \
+    php bin/magento setup:install --backend-frontname=admin --session-save=db --db-host=127.0.0.1 --db-name=magento --db-user=magento --db-password=password --base-url=http://localhost --timezone=Europe/Amsterdam --currency=EUR --admin-user=exampleuser --admin-password=examplepassword123 --admin-email=user@example.com --admin-firstname=Example --admin-lastname=Example --use-rewrites=1 --use-sample-data && \
     php bin/magento deploy:mode:set developer && \
+    php bin/magento sampledata:deploy && \
+    php bin/magento setup:upgrade && \
     php bin/magento setup:di:compile && \
     mkdir -p extensions && \
 #    if (( $(php -r 'echo version_compare(PHP_VERSION, "7.2", "ge") && version_compare(PHP_VERSION, "7.4", "lt") ? "true" : "false";') = "true" )); then composer require reach-digital/magento2-test-framework; fi && \
@@ -59,3 +62,5 @@ RUN if [ "${MAGENTO_VERSION}" = "2.4.0" ]; then git apply bundle-2684_dotmailer_
     rm bundle-2684_dotmailer_integration_tests-2020-08-04-04-31-22.patch
 
 ENTRYPOINT ["/bin/bash", "entrypoint.sh"]
+
+EXPOSE 80 3306
