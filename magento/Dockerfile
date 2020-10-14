@@ -16,9 +16,11 @@ RUN apt-get update --fix-missing && \
     apt-get install -y elasticsearch mariadb-server mariadb-client && \
     rm -rf /var/lib/apt/lists/* && \
     echo 'memory_limit = 2048M' >> /usr/local/etc/php/conf.d/memory-limit-php.ini && \
+    rm /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && \
     curl -o magento.zip https://repo-magento-mirror.fooman.co.nz/dist/magento/$MAGENTO_TYPE/magento-$MAGENTO_TYPE-$MAGENTO_VERSION.zip && \
     unzip -q magento.zip -d . && \
     rm magento.zip && \
+    composer global require hirak/prestissimo && \
     composer config --unset repositories.0 && \
     composer config repositories.fooman composer https://repo-magento-mirror.fooman.co.nz/ && \
     composer install && \
