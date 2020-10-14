@@ -8,12 +8,17 @@ ARG DEPLOY_MODE=developer
 ENV CI=true
 ENV MAGE_MODE=${DEPLOY_MODE}
 
-RUN apt-get update --fix-missing && \
-    apt-get install -y gnupg procps apt-transport-https && \
+RUN apt update --fix-missing && \
+    export DEBIAN_FRONTEND=noninteractive && \
+    apt install -y gnupg procps apt-transport-https lsb-release && \
     curl -L https://artifacts.elastic.co/GPG-KEY-elasticsearch | apt-key add - && \
     echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" | tee -a /etc/apt/sources.list.d/elastic-7.x.list && \
-    apt-get update && \
-    apt-get install -y elasticsearch mariadb-server mariadb-client && \
+    wget https://dev.mysql.com/get/mysql-apt-config_0.8.15-1_all.deb && \
+    dpkg -i mysql-apt-config_0.8.15-1_all.deb && \
+    echo mysql-apt-config mysql-apt-config/select-server select mysql-5.7 | debconf-set-selections && \
+    dpkg-reconfigure mysql-apt-config && \
+    apt update && \
+    apt install -y elasticsearch mysql-server mysql-client && \
     rm -rf /var/lib/apt/lists/* && \
     echo 'memory_limit = 2048M' >> /usr/local/etc/php/conf.d/memory-limit-php.ini && \
     rm /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && \
