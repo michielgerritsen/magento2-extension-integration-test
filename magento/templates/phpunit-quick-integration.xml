@@ -13,8 +13,9 @@
     <!-- Test suites definition -->
     <testsuites>
         <testsuite name="reachdigital">
-            <directory>../../../extensions/**/Test/Integration</directory>
-            <directory>../../../extensions/**/**/Test/Integration</directory>
+            <directory>/data/extensions/Test/Integration</directory>
+            <directory>/data/extensions/**/Test/Integration</directory>
+            <directory>/data/extensions/**/**/Test/Integration</directory>
         </testsuite>
     </testsuites>
 
