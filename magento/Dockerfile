@@ -20,7 +20,7 @@ RUN apt update --fix-missing && \
     apt update && \
     apt install -y elasticsearch mysql-server mysql-client && \
     rm -rf /var/lib/apt/lists/* && \
-    echo 'memory_limit = 2048M' >> /usr/local/etc/php/conf.d/memory-limit-php.ini && \
+    echo 'memory_limit = 4G' >> /usr/local/etc/php/conf.d/memory-limit-php.ini && \
     echo 'max_execution_time = 300' >> /usr/local/etc/php/conf.d/memory-limit-php.ini && \
     rm /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && \
     curl -o magento.zip https://repo-magento-mirror.fooman.co.nz/dist/magento/$MAGENTO_TYPE/magento-$MAGENTO_TYPE-$MAGENTO_VERSION.zip && \
