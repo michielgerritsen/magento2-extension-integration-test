@@ -48,8 +48,8 @@ RUN apt update --fix-missing && \
     php bin/magento sampledata:deploy && \
     php bin/magento setup:upgrade && \
     php bin/magento setup:di:compile && \
-    php bin/magento config:set catalog/frontend/flat_catalog_category 1 && \
-    php bin/magento config:set catalog/frontend/flat_catalog_product 1 && \
+    magerun2 config:store:set catalog/frontend/flat_catalog_category 1 && \
+    magerun2 config:store:set catalog/frontend/flat_catalog_product 1 && \
     php bin/magento indexer:reindex && \
     mkdir -p extensions && \
 #    if (( $(php -r 'echo version_compare(PHP_VERSION, "7.2", "ge") && version_compare(PHP_VERSION, "7.4", "lt") ? "true" : "false";') = "true" )); then composer require reach-digital/magento2-test-framework; fi && \
@@ -63,7 +63,7 @@ COPY templates/phpunit-integration.xml dev/tests/integration/phpunit.xml
 COPY templates/phpunit-quick-integration.xml dev/tests/quick-integration/phpunit.xml
 COPY entrypoint.sh entrypoint.sh
 
-RUN if [ "${MAGENTO_VERSION}" = "2.4.0" ]; then git apply bundle-2684_dotmailer_integration_tests-2020-08-04-04-31-22.patch; fi && \
+RUN if [ "${MAGENTO_VERSION}" = "2.4.0" -o "${MAGENTO_VERSION}" = "2.4.1" ]; then git apply bundle-2684_dotmailer_integration_tests-2020-08-04-04-31-22.patch; fi && \
     rm bundle-2684_dotmailer_integration_tests-2020-08-04-04-31-22.patch && \
     git apply cors.patch && \
     rm cors.patch
