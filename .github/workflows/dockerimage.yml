@@ -1,6 +1,7 @@
 name: Magento Community Edition Docker container build
 on:
   push:
+  pull_request:
 
 jobs:
   build:
