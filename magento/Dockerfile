@@ -47,8 +47,8 @@ RUN apt update --fix-missing && \
     php bin/magento sampledata:deploy && \
     php bin/magento setup:upgrade && \
     php bin/magento setup:di:compile && \
-    php bin/magento config:set catalog/frontend/flat_catalog_category 1 && \
-    php bin/magento config:set catalog/frontend/flat_catalog_product 1 && \
+    magerun2 config:store:set catalog/frontend/flat_catalog_category 1 && \
+    magerun2 config:store:set catalog/frontend/flat_catalog_product 1 && \
     php bin/magento indexer:reindex && \
     mkdir -p extensions && \
 #    if (( $(php -r 'echo version_compare(PHP_VERSION, "7.2", "ge") && version_compare(PHP_VERSION, "7.4", "lt") ? "true" : "false";') = "true" )); then composer require reach-digital/magento2-test-framework; fi && \
