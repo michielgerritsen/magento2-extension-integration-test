@@ -64,6 +64,7 @@ COPY templates/phpunit-quick-integration.xml dev/tests/quick-integration/phpunit
 COPY entrypoint.sh entrypoint.sh
 
 RUN if [ "${MAGENTO_VERSION}" = "2.4.0" ]; then git apply bundle-2684_dotmailer_integration_tests-2020-08-04-04-31-22.patch && rm bundle-2684_dotmailer_integration_tests-2020-08-04-04-31-22.patch; fi
+RUN if [ "${MAGENTO_VERSION}" = "2.4.0" -o "${MAGENTO_VERSION}" = "2.4.1" ]; then bin/magento module:disable Magento_TwoFactorAuth; fi
 RUN git apply cors.patch && rm cors.patch
 
 ENTRYPOINT ["/bin/bash", "entrypoint.sh"]
