@@ -15,6 +15,7 @@ RUN apt update --fix-missing && \
     echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" | tee -a /etc/apt/sources.list.d/elastic-7.x.list && \
     wget https://dev.mysql.com/get/mysql-apt-config_0.8.15-1_all.deb && \
     dpkg -i mysql-apt-config_0.8.15-1_all.deb && \
+    rm mysql-apt-config_0.8.15-1_all.deb && \
     echo mysql-apt-config mysql-apt-config/select-server select mysql-5.7 | debconf-set-selections && \
     dpkg-reconfigure mysql-apt-config && \
     apt update && \
@@ -64,7 +65,7 @@ COPY templates/phpunit-integration.xml dev/tests/integration/phpunit.xml
 COPY templates/phpunit-quick-integration.xml dev/tests/quick-integration/phpunit.xml
 COPY entrypoint.sh entrypoint.sh
 
-RUN if [ "${MAGENTO_VERSION}" = "2.4.0" ]; then git apply bundle-2684_dotmailer_integration_tests-2020-08-04-04-31-22.patch && rm bundle-2684_dotmailer_integration_tests-2020-08-04-04-31-22.patch; fi
+RUN if [ "${MAGENTO_VERSION}" = "2.4.0" ]; then git apply bundle-2684_dotmailer_integration_tests-2020-08-04-04-31-22.patch; fi && rm bundle-2684_dotmailer_integration_tests-2020-08-04-04-31-22.patch
 RUN git apply cors.patch && rm cors.patch
 
 ENTRYPOINT ["/bin/bash", "entrypoint.sh"]
