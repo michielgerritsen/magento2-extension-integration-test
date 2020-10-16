@@ -20,6 +20,7 @@ RUN apt update --fix-missing && \
     apt update && \
     apt install -y elasticsearch mysql-server mysql-client && \
     rm -rf /var/lib/apt/lists/* && \
+    sed -i "s/.*bind-address.*/bind-address = 0.0.0.0/" /etc/mysql/mysql.conf.d/mysqld.cnf && \
     echo 'memory_limit = 4G' >> /usr/local/etc/php/conf.d/memory-limit-php.ini && \
     echo 'max_execution_time = 300' >> /usr/local/etc/php/conf.d/memory-limit-php.ini && \
     rm /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && \
