@@ -63,7 +63,7 @@ COPY templates/phpunit-integration.xml dev/tests/integration/phpunit.xml
 COPY templates/phpunit-quick-integration.xml dev/tests/quick-integration/phpunit.xml
 COPY entrypoint.sh entrypoint.sh
 
-RUN if [ "${MAGENTO_VERSION}" = "2.4.0" ]; then git apply bundle-2684_dotmailer_integration_tests-2020-08-04-04-31-22.patch && rm bundle-2684_dotmailer_integration_tests-2020-08-04-04-31-22.patch; fi &&
+RUN if [ "${MAGENTO_VERSION}" = "2.4.0" ]; then git apply bundle-2684_dotmailer_integration_tests-2020-08-04-04-31-22.patch && rm bundle-2684_dotmailer_integration_tests-2020-08-04-04-31-22.patch; fi
 RUN if [ "${MAGENTO_VERSION}" = "2.4.0" -o "${MAGENTO_VERSION}" = "2.4.1" ]; then git apply cors.patch && rm cors.patch; fi
 
 ENTRYPOINT ["/bin/bash", "entrypoint.sh"]
