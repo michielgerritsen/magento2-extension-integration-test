@@ -47,11 +47,7 @@ RUN apt update --fix-missing && \
     sleep 5 && \
     php bin/magento setup:install --backend-frontname=admin --session-save=db --db-host=127.0.0.1 --db-name=magento --db-user=magento --db-password=password --base-url=http://localhost --timezone=Europe/Amsterdam --currency=EUR --admin-user=exampleuser --admin-password=examplepassword123 --admin-email=user@example.com --admin-firstname=Example --admin-lastname=Example --use-rewrites=1 --use-sample-data && \
     php bin/magento deploy:mode:set developer && \
-    php bin/magento sampledata:deploy && \
-    php bin/magento setup:upgrade && \
     php bin/magento setup:di:compile && \
-    magerun2 config:store:set catalog/frontend/flat_catalog_category 1 && \
-    magerun2 config:store:set catalog/frontend/flat_catalog_product 1 && \
     magerun2 indexer:reindex && \
     mkdir -p extensions && \
 #    if (( $(php -r 'echo version_compare(PHP_VERSION, "7.2", "ge") && version_compare(PHP_VERSION, "7.4", "lt") ? "true" : "false";') = "true" )); then composer require reach-digital/magento2-test-framework; fi && \
@@ -64,6 +60,12 @@ COPY templates/phpunit-unit.xml dev/tests/unit/phpunit.xml
 COPY templates/phpunit-integration.xml dev/tests/integration/phpunit.xml
 COPY templates/phpunit-quick-integration.xml dev/tests/quick-integration/phpunit.xml
 COPY entrypoint.sh entrypoint.sh
+
+COPY scripts/install-sample-data install-sample-data
+COPY scripts/enable-flat-catalog enable-flat-catalog
+COPY scripts/change-base-url change-base-url
+
+RUN chmod +x install-sample-data && chmod +x enable-flat-catalog && chmod +x change-base-url
 
 RUN if [ "${MAGENTO_VERSION}" = "2.4.0" ]; then git apply bundle-2684_dotmailer_integration_tests-2020-08-04-04-31-22.patch; fi && rm bundle-2684_dotmailer_integration_tests-2020-08-04-04-31-22.patch
 RUN git apply cors.patch && rm cors.patch
