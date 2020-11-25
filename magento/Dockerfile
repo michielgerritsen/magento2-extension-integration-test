@@ -15,11 +15,13 @@ RUN apt update --fix-missing && \
     echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" | tee -a /etc/apt/sources.list.d/elastic-7.x.list && \
     wget https://dev.mysql.com/get/mysql-apt-config_0.8.15-1_all.deb && \
     dpkg -i mysql-apt-config_0.8.15-1_all.deb && \
+    rm mysql-apt-config_0.8.15-1_all.deb && \
     echo mysql-apt-config mysql-apt-config/select-server select mysql-5.7 | debconf-set-selections && \
     dpkg-reconfigure mysql-apt-config && \
     apt update && \
     apt install -y elasticsearch mysql-server mysql-client && \
     rm -rf /var/lib/apt/lists/* && \
+    sed -i "s/.*bind-address.*/bind-address = 0.0.0.0/" /etc/mysql/mysql.conf.d/mysqld.cnf && \
     echo 'memory_limit = 4G' >> /usr/local/etc/php/conf.d/memory-limit-php.ini && \
     echo 'max_execution_time = 300' >> /usr/local/etc/php/conf.d/memory-limit-php.ini && \
     rm /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && \
@@ -45,12 +47,8 @@ RUN apt update --fix-missing && \
     sleep 5 && \
     php bin/magento setup:install --backend-frontname=admin --session-save=db --db-host=127.0.0.1 --db-name=magento --db-user=magento --db-password=password --base-url=http://localhost --timezone=Europe/Amsterdam --currency=EUR --admin-user=exampleuser --admin-password=examplepassword123 --admin-email=user@example.com --admin-firstname=Example --admin-lastname=Example --use-rewrites=1 --use-sample-data && \
     php bin/magento deploy:mode:set developer && \
-    php bin/magento sampledata:deploy && \
-    php bin/magento setup:upgrade && \
     php bin/magento setup:di:compile && \
-    magerun2 config:store:set catalog/frontend/flat_catalog_category 1 && \
-    magerun2 config:store:set catalog/frontend/flat_catalog_product 1 && \
-    php bin/magento indexer:reindex && \
+    magerun2 indexer:reindex && \
     mkdir -p extensions && \
 #    if (( $(php -r 'echo version_compare(PHP_VERSION, "7.2", "ge") && version_compare(PHP_VERSION, "7.4", "lt") ? "true" : "false";') = "true" )); then composer require reach-digital/magento2-test-framework; fi && \
     composer config repositories.dev-extensions path extensions/*
@@ -63,7 +61,13 @@ COPY templates/phpunit-integration.xml dev/tests/integration/phpunit.xml
 COPY templates/phpunit-quick-integration.xml dev/tests/quick-integration/phpunit.xml
 COPY entrypoint.sh entrypoint.sh
 
-RUN if [ "${MAGENTO_VERSION}" = "2.4.0" ]; then git apply bundle-2684_dotmailer_integration_tests-2020-08-04-04-31-22.patch && rm bundle-2684_dotmailer_integration_tests-2020-08-04-04-31-22.patch; fi
+COPY scripts/install-sample-data install-sample-data
+COPY scripts/enable-flat-catalog enable-flat-catalog
+COPY scripts/change-base-url change-base-url
+
+RUN chmod +x install-sample-data && chmod +x enable-flat-catalog && chmod +x change-base-url
+
+RUN if [ "${MAGENTO_VERSION}" = "2.4.0" ]; then git apply bundle-2684_dotmailer_integration_tests-2020-08-04-04-31-22.patch; fi && rm bundle-2684_dotmailer_integration_tests-2020-08-04-04-31-22.patch
 RUN if [ "${MAGENTO_VERSION}" = "2.4.0" -o "${MAGENTO_VERSION}" = "2.4.1" ]; then bin/magento module:disable Magento_TwoFactorAuth; fi
 RUN git apply cors.patch && rm cors.patch
 

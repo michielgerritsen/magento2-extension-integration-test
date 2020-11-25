@@ -25,11 +25,43 @@ A webserver is running and the Magento sample data is included. To show Magento 
 ```
 docker run --rm -p 1234:80 -p 3307:3306 -d --name magento michielgerritsen/magento-project-community-edition:php74-fpm-magento2.4.0
 ```
+
 After that you've to change the base url with:
 ```
-docker exec magento bin/magento config:set web/unsecure/base_url http://127.0.0.1:1234/
+docker exec magento ./change-base-url <domain-name>
 ```
 And then you should see the installation in your browser at http://127.0.0.1:1234/
+
+## Commands
+There are a few special command that you can run. Please note: you need to have the container started before running any of these commands.
+
+### bin/magento
+You can run bin/magento like this:
+```
+docker exec magento bin/magento <your:command:is:my:wish>
+```
+
+### Magerun
+```
+docker exec magento magerun2 <your:command:is:my:wish>
+```
+
+### Installing sample data
+```
+docker exec magento ./install-sample-data
+```
+
+## Enable flat catalog
+```
+docker exec magento ./enable-flat-catalog
+```
+
+## Change the base URL
+Make sure to include the trailing slash (/).
+```
+docker exec magento ./change-base-url <domain-name>
+docker exec magento ./change-base-url http://domain-name.test/
+```
 
 ## How to use in your own project
 

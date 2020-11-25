@@ -1,0 +1,8 @@
+#!/bin/bash
+
+set -e
+
+echo "Installing sampledata. This can take a while"
+php bin/magento sampledata:deploy
+php bin/magento setup:upgrade
+php bin/magento setup:di:compile
