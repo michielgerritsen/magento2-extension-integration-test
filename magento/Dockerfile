@@ -47,6 +47,7 @@ RUN apt update --fix-missing && \
     sleep 5 && \
     php bin/magento setup:install --backend-frontname=admin --session-save=db --db-host=127.0.0.1 --db-name=magento --db-user=magento --db-password=password --base-url=http://localhost --timezone=Europe/Amsterdam --currency=EUR --admin-user=exampleuser --admin-password=examplepassword123 --admin-email=user@example.com --admin-firstname=Example --admin-lastname=Example --use-rewrites=1 --use-sample-data && \
     php bin/magento deploy:mode:set developer && \
+    if [ "${MAGENTO_VERSION}" = "2.4.0" -o "${MAGENTO_VERSION}" = "2.4.1" ]; then bin/magento module:disable Magento_TwoFactorAuth; fi && \
     php bin/magento setup:di:compile && \
     magerun2 indexer:reindex && \
     mkdir -p extensions && \
@@ -68,7 +69,6 @@ COPY scripts/change-base-url change-base-url
 RUN chmod +x install-sample-data && chmod +x enable-flat-catalog && chmod +x change-base-url
 
 RUN if [ "${MAGENTO_VERSION}" = "2.4.0" ]; then git apply bundle-2684_dotmailer_integration_tests-2020-08-04-04-31-22.patch; fi && rm bundle-2684_dotmailer_integration_tests-2020-08-04-04-31-22.patch
-RUN if [ "${MAGENTO_VERSION}" = "2.4.0" -o "${MAGENTO_VERSION}" = "2.4.1" ]; then bin/magento module:disable --clear-static-content Magento_TwoFactorAuth; fi
 RUN git apply cors.patch && rm cors.patch
 
 ENTRYPOINT ["/bin/bash", "entrypoint.sh"]
