@@ -3,6 +3,7 @@ FROM srcoder/development-php:${PHP_VERSION}
 
 ARG MAGENTO_VERSION=2.3.2
 ARG MAGENTO_TYPE=project-community-edition
+ARG SAMPLE_DATA=false
 ARG DEPLOY_MODE=developer
 
 ENV CI=true
@@ -47,6 +48,8 @@ RUN apt update --fix-missing && \
     sleep 5 && \
     php bin/magento setup:install --backend-frontname=admin --session-save=db --db-host=127.0.0.1 --db-name=magento --db-user=magento --db-password=password --base-url=http://localhost --timezone=Europe/Amsterdam --currency=EUR --admin-user=exampleuser --admin-password=examplepassword123 --admin-email=user@example.com --admin-firstname=Example --admin-lastname=Example --use-rewrites=1 --use-sample-data && \
     php bin/magento deploy:mode:set developer && \
+    if [ "${SAMPLE_DATA}" = "true" ]; then php bin/magento sampledata:deploy; fi && \
+    if [ "${SAMPLE_DATA}" = "true" ]; then php bin/magento setup:upgrade; fi && \
     php bin/magento setup:di:compile && \
     magerun2 indexer:reindex && \
     mkdir -p extensions && \
