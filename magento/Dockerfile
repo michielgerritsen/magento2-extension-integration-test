@@ -1,7 +1,7 @@
-ARG PHP_VERSION=php72-fpm
+ARG PHP_VERSION=php74-fpm
 FROM srcoder/development-php:${PHP_VERSION}
 
-ARG MAGENTO_VERSION=2.3.2
+ARG MAGENTO_VERSION=2.4.1
 ARG MAGENTO_TYPE=project-community-edition
 ARG DEPLOY_MODE=developer
 
