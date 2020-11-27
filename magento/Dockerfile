@@ -1,13 +1,12 @@
-ARG PHP_VERSION=php72-fpm
+ARG PHP_VERSION=php74-fpm
 FROM srcoder/development-php:${PHP_VERSION}
 
-ARG MAGENTO_VERSION=2.3.2
+ARG MAGENTO_VERSION=2.4.1
 ARG MAGENTO_TYPE=project-community-edition
 ARG SAMPLE_DATA=false
-ARG DEPLOY_MODE=developer
 
-ENV CI=true
-ENV MAGE_MODE=${DEPLOY_MODE}
+ENV URL=http://localhost/
+ENV FLAT_TABLES=false
 
 RUN apt update --fix-missing && \
     export DEBIAN_FRONTEND=noninteractive && \
@@ -50,6 +49,7 @@ RUN apt update --fix-missing && \
     php bin/magento deploy:mode:set developer && \
     if [ "${SAMPLE_DATA}" = "true" ]; then php bin/magento sampledata:deploy; fi && \
     if [ "${SAMPLE_DATA}" = "true" ]; then php bin/magento setup:upgrade; fi && \
+    if [ "${MAGENTO_VERSION}" = "2.4.0" -o "${MAGENTO_VERSION}" = "2.4.1" ]; then bin/magento module:disable Magento_TwoFactorAuth; fi && \
     php bin/magento setup:di:compile && \
     magerun2 indexer:reindex && \
     mkdir -p extensions && \
