@@ -3,10 +3,9 @@ FROM srcoder/development-php:${PHP_VERSION}
 
 ARG MAGENTO_VERSION=2.3.2
 ARG MAGENTO_TYPE=project-community-edition
-ARG DEPLOY_MODE=developer
 
-ENV CI=true
-ENV MAGE_MODE=${DEPLOY_MODE}
+ENV URL=http://localhost/
+ENV FLAT_TABLES=false
 
 RUN apt update --fix-missing && \
     export DEBIAN_FRONTEND=noninteractive && \
