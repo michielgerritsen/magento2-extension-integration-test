@@ -22,6 +22,21 @@ if [ $status -ne 0 ]; then
   exit $status
 fi
 
+if [ -n "$URL" ]; then
+  magerun2 config:store:set web/unsecure/base_url $URL
+  magerun2 config:store:set web/secure/base_url $URL
+  magerun2 config:store:set web/unsecure/base_link_url $URL
+  magerun2 config:store:set web/secure/base_link_url $URL
+  magerun2 cache:flush
+fi
+
+if [ -n "$FLAT_TABLES" ]; then
+  magerun2 config:store:set catalog/frontend/flat_catalog_category 1
+  magerun2 config:store:set catalog/frontend/flat_catalog_product 1
+  magerun2 cache:flush
+  magerun2 indexer:reindex
+fi
+
 while sleep 5; do
   ps aux |grep elasticsearch |grep -q -v grep
   ELASTICSEARCH_STATUS=$?
