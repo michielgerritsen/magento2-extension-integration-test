@@ -5,6 +5,7 @@ ARG MAGENTO_VERSION=2.4.1
 ARG MAGENTO_TYPE=project-community-edition
 ARG SAMPLE_DATA=false
 
+ENV CI=true
 ENV URL=http://localhost/
 ENV FLAT_TABLES=false
 
