@@ -121,4 +121,4 @@ jobs:
 
     - name: Push the image to Docker hub
       if: github.ref == 'refs/heads/build'
-      run: docker push michielgerritsen/magento-project-community-edition
+      run: docker push michielgerritsen/magento-project-community-edition:${{ matrix.cfg.PHP_VERSION }}-magento${{ matrix.cfg.MAGENTO_VERSION }}
