@@ -50,7 +50,7 @@ RUN apt update --fix-missing && \
     php bin/magento deploy:mode:set developer && \
     if [ "${SAMPLE_DATA}" = "true" ]; then php bin/magento sampledata:deploy; fi && \
     if [ "${SAMPLE_DATA}" = "true" ]; then php bin/magento setup:upgrade; fi && \
-    if [ "${MAGENTO_VERSION}" = "2.4.0" -o "${MAGENTO_VERSION}" = "2.4.1" ]; then bin/magento module:disable Magento_TwoFactorAuth; fi && \
+    if (( $(php -r 'echo substr(getenv("MAGENTO_VERSION"), 0, 3) == "2.4" ? "true" : "false";') = "true" )); then bin/magento module:disable Magento_TwoFactorAuth; fi && \
     php bin/magento setup:di:compile && \
     magerun2 indexer:reindex && \
     mkdir -p extensions && \
