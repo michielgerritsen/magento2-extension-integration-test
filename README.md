@@ -21,7 +21,7 @@ docker run -d --rm \
     -p 3307:3306 \
     -e URL=http://localhost:1234/ \
     -e FLAT_TABLES=false \
-    michielgerritsen/magento-project-community-edition:php74-fpm-magento2.4.1
+    michielgerritsen/magento-project-community-edition:php74-fpm-magento2.4.2
 ```
 
 ### Docker Compose
@@ -31,7 +31,7 @@ version: '3'
 services:
   magento:
     container_name: magento
-    image: michielgerritsen/magento-project-community-edition:php74-fpm-magento2.4.1
+    image: michielgerritsen/magento-project-community-edition:php74-fpm-magento2.4.2
     ports:
       - 1234:80
       - 3307:3306
@@ -59,7 +59,6 @@ There are a few special command that you can run.
 | --- | --- | --- |
 | bin/magento | `docker exec magento bin/magento <your:command:is:my:wish>` |
 | magerun2 | `docker exec magento magerun2 <your:command:is:my:wish>` |
-| Install sample data | `docker exec magento ./install-sample-data` | If you did not use a `-sample-data` suffixed image |
 | Enable flat catalog | `docker exec magento ./enable-flat-catalog` | If you did not enabled it with the `FLAT_TABLES` variable |
 | Change the base URL | `docker exec magento ./change-base-url <domain-name>` | 
 
