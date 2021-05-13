@@ -42,6 +42,8 @@ services:
 
 ## Parameters
 
+These are all optional and only required when you want to run the container to access the web interface.
+
 | Parameter | Info  |
 | --- | --- |
 | `-p 1234:80` | Make the webserver available at port 1234. Optional if you do not need to visit Magento in the browser. |
