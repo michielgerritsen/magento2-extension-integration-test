@@ -7,17 +7,13 @@ on: push
 jobs:
   build:
     strategy:
-      # This Matrix will run the tests on PHP 7.0, 7.1 and 7.2 and on Magento 2.2.11 and 2.3.5-p1.
-      # Magento 2.3.5-p1 requires PHP 7.1 and higher, so PHP 7.0 is disabled for this version.
-      # Magento 2.2.11 supports PHP up to version 7.1, so PHP 7.2 is disabled for this version.
+      # This Matrix will run the tests on PHP 7.3, and 7.4, and on Magento 2.3.7 and 2.4.2-p1.
       matrix:
-        PHP_VERSION: [php7-fpm, php71-fpm, php72-fpm]
-        MAGENTO_VERSION: [2.2.11, 2.3.4]
-        exclude:
-          - PHP_VERSION: php7-fpm
-            MAGENTO_VERSION: 2.3.4
-          - PHP_VERSION: php72-fpm
-            MAGENTO_VERSION: 2.2.11
+        include:
+          - PHP_VERSION: php73-fpm
+            MAGENTO_VERSION: 2.3.7
+          - PHP_VERSION: php74-fpm
+            MAGENTO_VERSION: 2.4.2-p1
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
@@ -34,8 +30,8 @@ jobs:
 
       # Replace <VENDOR> and <MODULE> with the name in your `composer.json`.
       - name: Install the extension in Magento
-        run: docker exec magento-project-community-edition composer require <VENDOR>/<MODULE>:@dev
+        run: docker exec magento-project-community-edition composer require <VENDOR>/<MODULE>:"dev-${GITHUB_SHA} as 1.x-dev"
 
       # Only the tests in your repository will be run, the default Magento tests are not included in this.
       - name: Run tests
-        run: docker exec magento-project-community-edition bash -c "vendor/bin/phpunit extensions/workdir/Test/Unit"
+        run: docker exec magento-project-community-edition bash -c "vendor/bin/phpunit extensions/${{ github.event.repository.name }}/Test/Unit"
