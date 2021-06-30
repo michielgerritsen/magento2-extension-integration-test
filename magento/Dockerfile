@@ -13,7 +13,7 @@ COPY patches/vertex-compilation-issue.patch vertex-compilation-issue.patch
 
 RUN apt update --fix-missing && \
     export DEBIAN_FRONTEND=noninteractive && \
-    apt install -y gnupg procps apt-transport-https lsb-release nginx && \
+    apt install -y gnupg procps apt-transport-https lsb-release && \
     curl -L https://artifacts.elastic.co/GPG-KEY-elasticsearch | apt-key add - && \
     echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" | tee -a /etc/apt/sources.list.d/elastic-7.x.list && \
     wget https://dev.mysql.com/get/mysql-apt-config_0.8.15-1_all.deb && \
@@ -28,8 +28,6 @@ RUN apt update --fix-missing && \
     echo 'memory_limit = 4G' >> /usr/local/etc/php/conf.d/memory-limit-php.ini && \
     echo 'max_execution_time = 300' >> /usr/local/etc/php/conf.d/memory-limit-php.ini && \
     rm /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && \
-    sed -i "s/.*user.*/user = root/" /usr/local/etc/php-fpm.conf && \
-    sed -i "s/.*group.*/group = root/" /usr/local/etc/php-fpm.conf && \
     curl -o magento.zip https://repo-magento-mirror.fooman.co.nz/dist/magento/$MAGENTO_TYPE/magento-$MAGENTO_TYPE-$MAGENTO_VERSION.zip && \
     unzip -q magento.zip -d . && \
     rm magento.zip && \
@@ -69,7 +67,6 @@ COPY templates/install-config-mysql.php dev/tests/integration/etc/
 COPY templates/phpunit-unit.xml dev/tests/unit/phpunit.xml
 COPY templates/phpunit-integration.xml dev/tests/integration/phpunit.xml
 COPY templates/phpunit-quick-integration.xml dev/tests/quick-integration/phpunit.xml
-COPY templates/nginx /etc/nginx/sites-available/default
 COPY entrypoint.sh entrypoint.sh
 
 COPY scripts/enable-flat-catalog enable-flat-catalog
