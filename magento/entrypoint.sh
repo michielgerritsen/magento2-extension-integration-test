@@ -15,17 +15,10 @@ if [ $status -ne 0 ]; then
   exit $status
 fi
 
-nohup /usr/local/sbin/php-fpm -R &
+nohup /usr/local/bin/php -S 0.0.0.0:80 -t /data/pub/ /data/phpserver/router.php &
 status=$?
 if [ $status -ne 0 ]; then
-  echo "Failed to start php fpm: $status"
-  exit $status
-fi
-
-nohup /usr/sbin/nginx &
-status=$?
-if [ $status -ne 0 ]; then
-  echo "Failed to start nginx: $status"
+  echo "Failed to start the php server: $status"
   exit $status
 fi
 
@@ -49,12 +42,10 @@ while sleep 5; do
   ELASTICSEARCH_STATUS=$?
   ps aux |grep mysqld_safe |grep -q -v grep
   MYSQL_STATUS=$?
-  ps aux |grep php-fpm |grep -q -v grep
+  ps aux |grep php |grep -q -v grep
   PHP_STATUS=$?
-  ps aux |grep nginx |grep -q -v grep
-  NGINX_STATUS=$?
 
-  if [ $ELASTICSEARCH_STATUS -ne 0 -o $MYSQL_STATUS -ne 0 -o $PHP_STATUS -ne 0 -o $NGINX_STATUS -ne 0 ]; then
+  if [ $ELASTICSEARCH_STATUS -ne 0 -o $MYSQL_STATUS -ne 0 -o $PHP_STATUS -ne 0 ]; then
     echo "One of the processes has already exited."
     exit 1
   fi
