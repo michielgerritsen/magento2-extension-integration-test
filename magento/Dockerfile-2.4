@@ -10,18 +10,18 @@ ENV URL=http://localhost/
 ENV FLAT_TABLES=false
 
 COPY patches/vertex-compilation-issue.patch vertex-compilation-issue.patch
+COPY patches/79e90baca6442c0fb3627dd1fa1b083c8df4fa01.patch 79e90baca6442c0fb3627dd1fa1b083c8df4fa01.patch
+COPY patches/pr-33803.diff pr-33803.diff
 
 RUN apt update --fix-missing && \
     export DEBIAN_FRONTEND=noninteractive && \
-    apt install -y gnupg procps apt-transport-https lsb-release && \
+    apt install -y gnupg procps apt-transport-https lsb-release software-properties-common && \
     curl -L https://artifacts.elastic.co/GPG-KEY-elasticsearch | apt-key add - && \
     echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" | tee -a /etc/apt/sources.list.d/elastic-7.x.list && \
-    wget https://dev.mysql.com/get/mysql-apt-config_0.8.15-1_all.deb && \
-    dpkg -i mysql-apt-config_0.8.15-1_all.deb && \
-    rm mysql-apt-config_0.8.15-1_all.deb && \
-    echo mysql-apt-config mysql-apt-config/select-server select mysql-5.7 | debconf-set-selections && \
-    dpkg-reconfigure mysql-apt-config && \
+    wget https://repo.mysql.com//mysql-apt-config_0.8.18-1_all.deb && \
+    dpkg -i mysql-apt-config_0.8.18-1_all.deb && \
     apt update && \
+    echo "[mysqld]\ndefault-authentication-plugin=mysql_native_password" > ~/.my.cnf && \
     apt install -y elasticsearch mysql-server mysql-client && \
     rm -rf /var/lib/apt/lists/* && \
     sed -i "s/.*bind-address.*/bind-address = 0.0.0.0/" /etc/mysql/mysql.conf.d/mysqld.cnf && \
@@ -50,23 +50,20 @@ RUN apt update --fix-missing && \
     sleep 5 && \
     php bin/magento setup:install --backend-frontname=admin --session-save=db --db-host=127.0.0.1 --db-name=magento --db-user=magento --db-password=password --base-url=http://localhost --timezone=Europe/Amsterdam --currency=EUR --admin-user=exampleuser --admin-password=examplepassword123 --admin-email=user@example.com --admin-firstname=Example --admin-lastname=Example --use-rewrites=1 --use-sample-data && \
     php bin/magento deploy:mode:set developer && \
-    if (( $(php -r 'echo substr(getenv("MAGENTO_VERSION"), 0, 6) == "2.2.10" ? "true" : "false";') = "true" )); then git apply vertex-compilation-issue.patch; fi && \
-    if (( $(php -r 'echo substr(getenv("MAGENTO_VERSION"), 0, 5) == "2.3.3" ? "true" : "false";') = "true" )); then git apply vertex-compilation-issue.patch; fi && \
     if [ "${SAMPLE_DATA}" = "true" ]; then php bin/magento sampledata:deploy; fi && \
     if [ "${SAMPLE_DATA}" = "true" ]; then php bin/magento setup:upgrade; fi && \
-    if (( $(php -r 'echo substr(getenv("MAGENTO_VERSION"), 0, 3) == "2.4" ? "true" : "false";') = "true" )); then bin/magento module:disable Magento_TwoFactorAuth; fi && \
     php bin/magento setup:di:compile && \
     magerun2 indexer:reindex && \
     mkdir -p extensions && \
-#    if (( $(php -r 'echo version_compare(PHP_VERSION, "7.2", "ge") && version_compare(PHP_VERSION, "7.4", "lt") ? "true" : "false";') = "true" )); then composer require reach-digital/magento2-test-framework; fi && \
-    composer config repositories.dev-extensions path extensions/*
+    composer config repositories.dev-extensions path extensions/* && \
+    if (( $(php -r 'echo substr(getenv("MAGENTO_VERSION"), 0, 5) == "2.4.3" ? "true" : "false";') = "true" )); then git apply pr-33803.diff; rm pr-33803.diff; fi
 
 COPY patches/bundle-2684_dotmailer_integration_tests-2020-08-04-04-31-22.patch bundle-2684_dotmailer_integration_tests-2020-08-04-04-31-22.patch
 COPY patches/cors.patch cors.patch
 COPY templates/install-config-mysql.php dev/tests/integration/etc/
+COPY templates/post-install-setup-command-config.php dev/tests/integration/etc/
 COPY templates/phpunit-unit.xml dev/tests/unit/phpunit.xml
 COPY templates/phpunit-integration.xml dev/tests/integration/phpunit.xml
-COPY templates/phpunit-quick-integration.xml dev/tests/quick-integration/phpunit.xml
 COPY entrypoint.sh entrypoint.sh
 
 COPY scripts/enable-flat-catalog enable-flat-catalog

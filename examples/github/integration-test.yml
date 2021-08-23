@@ -32,13 +32,13 @@ jobs:
       - name: Install the extension in Magento
         run: docker exec magento-project-community-edition composer require <VENDOR>/<MODULE>:"dev-${GITHUB_SHA} as 1.x-dev"
 
-      # This step is optional but good to include in your pipeline.
-      - name: Run setup:di:compile
-        run: docker exec magento-project-community-edition php bin/magento setup:di:compile
-
       # I'm not sure why, but this step is required. You might end up with loads and loads of failed tests.
       - name: Enable developer mode
         run: docker exec magento-project-community-edition php bin/magento deploy:mode:set developer
+
+      # This step is optional but good to include in your pipeline.
+      - name: Run setup:di:compile
+        run: docker exec magento-project-community-edition php bin/magento setup:di:compile
 
       # Only the tests in your repository will be run, the default Magento tests are not included in this.
       - name: Run tests
