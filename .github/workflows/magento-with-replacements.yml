@@ -17,7 +17,7 @@ jobs:
     - name: Build the Docker image
       run:
         docker build magento -f magento/Dockerfile-with-replacements
-        -t michielgerritsen/magento-project-community-edition:${{ matrix.cfg.PHP_VERSION }}-magento${{ matrix.cfg.MAGENTO_VERSION }}
+        -t michielgerritsen/magento-project-community-edition:${{ matrix.cfg.PHP_VERSION }}-magento${{ matrix.cfg.MAGENTO_VERSION }}-with-replacements
         --build-arg MAGENTO_VERSION=${{ matrix.cfg.MAGENTO_VERSION }}
         --build-arg PHP_VERSION=${{ matrix.cfg.PHP_VERSION }}
 
