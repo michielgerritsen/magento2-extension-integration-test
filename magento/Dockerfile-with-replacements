@@ -1,0 +1,77 @@
+ARG PHP_VERSION=php74-fpm
+FROM srcoder/development-php:${PHP_VERSION}
+
+ARG MAGENTO_VERSION=2.4.3
+ARG MAGENTO_TYPE=project-community-edition
+
+ENV CI=true
+ENV URL=http://localhost/
+ENV FLAT_TABLES=false
+
+COPY patches/vertex-compilation-issue.patch vertex-compilation-issue.patch
+COPY patches/79e90baca6442c0fb3627dd1fa1b083c8df4fa01.patch 79e90baca6442c0fb3627dd1fa1b083c8df4fa01.patch
+COPY patches/pr-33803.diff pr-33803.diff
+
+RUN apt update --fix-missing && \
+    export DEBIAN_FRONTEND=noninteractive && \
+    apt install -y gnupg procps apt-transport-https lsb-release software-properties-common && \
+    curl -L https://artifacts.elastic.co/GPG-KEY-elasticsearch | apt-key add - && \
+    echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" | tee -a /etc/apt/sources.list.d/elastic-7.x.list && \
+    wget https://repo.mysql.com//mysql-apt-config_0.8.18-1_all.deb && \
+    dpkg -i mysql-apt-config_0.8.18-1_all.deb && \
+    apt update && \
+    echo "[mysqld]\ndefault-authentication-plugin=mysql_native_password" > ~/.my.cnf && \
+    apt install -y elasticsearch mysql-server mysql-client && \
+    rm -rf /var/lib/apt/lists/* && \
+    sed -i "s/.*bind-address.*/bind-address = 0.0.0.0/" /etc/mysql/mysql.conf.d/mysqld.cnf && \
+    echo 'memory_limit = 4G' >> /usr/local/etc/php/conf.d/memory-limit-php.ini && \
+    echo 'max_execution_time = 300' >> /usr/local/etc/php/conf.d/memory-limit-php.ini && \
+    rm /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && \
+    curl -o magento.zip https://repo-magento-mirror.fooman.co.nz/dist/magento/$MAGENTO_TYPE/magento-$MAGENTO_TYPE-$MAGENTO_VERSION.zip && \
+    unzip -q magento.zip -d . && \
+    rm magento.zip && \
+    composer global require hirak/prestissimo
+
+COPY templates/magento-2.4.3-composer-with-replacements.json composer.json
+
+RUN composer install && \
+    if [ -f "/data/vendor/magento/module-inventory-catalog/etc/communication.xml" ]; then sed -i 's/is_synchronous="false"//g' /data/vendor/magento/module-inventory-catalog/etc/communication.xml; fi && \
+    if [ -f "/data/vendor/magento/module-inventory-sales/etc/communication.xml" ]; then sed -i 's/is_synchronous="false"//g' /data/vendor/magento/module-inventory-sales/etc/communication.xml; fi && \
+    if [ -f "/data/vendor/magento/module-inventory-indexer/etc/communication.xml" ]; then sed -i 's/is_synchronous="false"//g' /data/vendor/magento/module-inventory-indexer/etc/communication.xml; fi && \
+    service elasticsearch start && \
+    /bin/bash -c "/usr/bin/mysqld_safe &" && \
+    sleep 5 && \
+    mysql -u root -e 'CREATE DATABASE `magento`;' && \
+    mysql -u root -e 'CREATE DATABASE `magento-test`;' && \
+    mysql -u root -e "CREATE USER 'magento'@'%' IDENTIFIED BY 'password';" && \
+    mysql -u root -e "CREATE USER 'magento-test'@'%' IDENTIFIED BY 'password';" && \
+    mysql -u root -e "GRANT ALL PRIVILEGES ON * . * TO 'magento'@'%';" && \
+    mysql -u root -e "GRANT ALL PRIVILEGES ON * . * TO 'magento-test'@'%';" && \
+    sleep 5 && \
+    php bin/magento setup:install --backend-frontname=admin --session-save=db --db-host=127.0.0.1 --db-name=magento --db-user=magento --db-password=password --base-url=http://localhost --timezone=Europe/Amsterdam --currency=EUR --admin-user=exampleuser --admin-password=examplepassword123 --admin-email=user@example.com --admin-firstname=Example --admin-lastname=Example --use-rewrites=1 && \
+    php bin/magento deploy:mode:set developer && \
+    php bin/magento setup:di:compile && \
+    magerun2 indexer:reindex && \
+    mkdir -p extensions && \
+    composer config repositories.dev-extensions path extensions/* && \
+    if (( $(php -r 'echo substr(getenv("MAGENTO_VERSION"), 0, 5) == "2.4.3" ? "true" : "false";') = "true" )); then git apply pr-33803.diff; rm pr-33803.diff; fi
+
+COPY patches/bundle-2684_dotmailer_integration_tests-2020-08-04-04-31-22.patch bundle-2684_dotmailer_integration_tests-2020-08-04-04-31-22.patch
+COPY patches/cors.patch cors.patch
+COPY templates/install-config-mysql.php dev/tests/integration/etc/
+COPY templates/post-install-setup-command-config.php dev/tests/integration/etc/
+COPY templates/phpunit-unit.xml dev/tests/unit/phpunit.xml
+COPY templates/phpunit-integration.xml dev/tests/integration/phpunit.xml
+COPY entrypoint.sh entrypoint.sh
+
+COPY scripts/enable-flat-catalog enable-flat-catalog
+COPY scripts/change-base-url change-base-url
+
+RUN chmod +x enable-flat-catalog && chmod +x change-base-url
+
+RUN if [ "${MAGENTO_VERSION}" = "2.4.0" ]; then git apply bundle-2684_dotmailer_integration_tests-2020-08-04-04-31-22.patch; fi && rm bundle-2684_dotmailer_integration_tests-2020-08-04-04-31-22.patch
+RUN git apply cors.patch && rm cors.patch vertex-compilation-issue.patch
+
+ENTRYPOINT ["/bin/bash", "entrypoint.sh"]
+
+EXPOSE 80 3306
