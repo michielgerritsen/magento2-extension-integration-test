@@ -1,0 +1,52 @@
+name: Magento 2.4 with Composer replacements
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        cfg:
+          - { PHP_VERSION: php74-fpm, MAGENTO_VERSION: 2.4.3-p1 }
+    steps:
+    - uses: actions/checkout@v1
+
+    # Step 1: Build the docker image
+    - name: Build the Docker image
+      run:
+        docker build magento -f magento/Dockerfile-with-replacements
+        -t michielgerritsen/magento-project-community-edition:${{ matrix.cfg.PHP_VERSION }}-magento${{ matrix.cfg.MAGENTO_VERSION }}
+        --build-arg MAGENTO_VERSION=${{ matrix.cfg.MAGENTO_VERSION }}
+        --build-arg PHP_VERSION=${{ matrix.cfg.PHP_VERSION }}
+
+    # Step 2: Test the docker image
+    - name: Start the docker image
+      run:
+        docker run --memory=4G --detach --name magento-project-community-edition
+        michielgerritsen/magento-project-community-edition:${{ matrix.cfg.PHP_VERSION }}-magento${{ matrix.cfg.MAGENTO_VERSION }}
+
+    - name: Create the dummy test directory
+      run: docker exec magento-project-community-edition mkdir -p /data/app/code/MichielGerritsen/Magento2ExtensionIntegrationTest/Test/Integration
+
+    - name: Copy the example test
+      run: for file in Test/*; do docker cp $file magento-project-community-edition:/data/app/code/MichielGerritsen/Magento2ExtensionIntegrationTest/Test/Integration/; done
+
+    - name: Enable developer mode
+      run: docker exec magento-project-community-edition bash -c "until php bin/magento deploy:mode:set developer || (( count++ >= 10 )); do echo 'Command failed. New try'; done"
+
+    - name: Run setup:di:compile
+      run: docker exec magento-project-community-edition php bin/magento setup:di:compile || docker exec magento-project-community-edition php bin/magento setup:di:compile || docker exec magento-project-community-edition php bin/magento setup:di:compile || docker exec magento-project-community-edition php bin/magento setup:di:compile
+
+    - name: Run the example test
+      run: docker exec magento-project-community-edition bash -c "cd /data/dev/tests/integration/ && ../../../vendor/bin/phpunit /data/app/code/MichielGerritsen/Magento2ExtensionIntegrationTest/Test/Integration/ExampleTest.php"
+
+    # Step 3: Upload the images to Docker Hub.
+    - name: Docker hub login
+      if: github.ref == 'refs/heads/build'
+      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+    - name: Push the image to Docker hub
+      if: github.ref == 'refs/heads/build'
+      run: docker push michielgerritsen/magento-project-community-edition:${{ matrix.cfg.PHP_VERSION }}-magento${{ matrix.cfg.MAGENTO_VERSION }}-with-replacements
