@@ -9,7 +9,7 @@ jobs:
     strategy:
       matrix:
         cfg:
-          - { PHP_VERSION: php74-fpm, MAGENTO_VERSION: 2.4.3-p1 }
+          - { PHP_VERSION: php74-fpm, MAGENTO_VERSION: 2.4.3 }
     steps:
     - uses: actions/checkout@v1
 
