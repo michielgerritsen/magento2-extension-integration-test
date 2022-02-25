@@ -12,6 +12,9 @@ ENV FLAT_TABLES=false
 COPY patches/vertex-compilation-issue.patch vertex-compilation-issue.patch
 COPY patches/79e90baca6442c0fb3627dd1fa1b083c8df4fa01.patch 79e90baca6442c0fb3627dd1fa1b083c8df4fa01.patch
 COPY patches/pr-33803.diff pr-33803.diff
+COPY patches/APSB22-12/MDVA-43395_EE_2.4.3-p1_COMPOSER_v1.patch MDVA-43395_EE_2.4.3-p1_COMPOSER_v1.patch
+COPY patches/APSB22-12/MDVA-43443_EE_2.4.2-p2_COMPOSER_v1.patch MDVA-43443_EE_2.4.2-p2_COMPOSER_v1.patch
+COPY patches/APSB22-12/MDVA-43443_EE_2.4.3-p1_COMPOSER_v1.patch MDVA-43443_EE_2.4.3-p1_COMPOSER_v1.patch
 
 RUN apt update --fix-missing && \
     export DEBIAN_FRONTEND=noninteractive && \
@@ -19,6 +22,7 @@ RUN apt update --fix-missing && \
     curl -L https://artifacts.elastic.co/GPG-KEY-elasticsearch | apt-key add - && \
     echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" | tee -a /etc/apt/sources.list.d/elastic-7.x.list && \
     wget https://repo.mysql.com//mysql-apt-config_0.8.18-1_all.deb && \
+    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 467B942D3A79BD29 && \
     dpkg -i mysql-apt-config_0.8.18-1_all.deb && \
     apt update && \
     echo "[mysqld]\ndefault-authentication-plugin=mysql_native_password" > ~/.my.cnf && \
@@ -48,6 +52,9 @@ RUN apt update --fix-missing && \
     mysql -u root -e "GRANT ALL PRIVILEGES ON * . * TO 'magento'@'%';" && \
     mysql -u root -e "GRANT ALL PRIVILEGES ON * . * TO 'magento-test'@'%';" && \
     sleep 5 && \
+    echo "applying MDVA-43395_EE_2.4.3-p1_COMPOSER_v1.patch"; git apply MDVA-43395_EE_2.4.3-p1_COMPOSER_v1.patch && \
+    if (( $(php -r 'echo version_compare(getenv("MAGENTO_VERSION"), "2.4.2-p2", "<=") ? "true" : "false";') = "true" )); then echo "applying MDVA-43443_EE_2.4.2-p2_COMPOSER_v1.patch"; git apply MDVA-43443_EE_2.4.2-p2_COMPOSER_v1.patch; fi && \
+    if (( $(php -r 'echo version_compare(getenv("MAGENTO_VERSION"), "2.4.3", ">=") ? "true" : "false";') = "true" )); then echo "applying MDVA-43443_EE_2.4.3-p1_COMPOSER_v1.patch"; git apply MDVA-43443_EE_2.4.3-p1_COMPOSER_v1.patch; fi && \
     php bin/magento setup:install --backend-frontname=admin --session-save=db --db-host=127.0.0.1 --db-name=magento --db-user=magento --db-password=password --base-url=http://localhost --timezone=Europe/Amsterdam --currency=EUR --admin-user=exampleuser --admin-password=examplepassword123 --admin-email=user@example.com --admin-firstname=Example --admin-lastname=Example --use-rewrites=1 --use-sample-data && \
     php bin/magento deploy:mode:set developer && \
     if [ "${SAMPLE_DATA}" = "true" ]; then php bin/magento sampledata:deploy; fi && \
