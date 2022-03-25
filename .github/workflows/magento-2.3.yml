@@ -2,6 +2,8 @@ name: Magento 2.3 Community Edition Docker container build
 on:
   push:
   pull_request:
+  schedule:
+    - cron: '0 0 * * 1'
 
 jobs:
   build:
