@@ -51,6 +51,7 @@ RUN apt update --fix-missing && \
     php bin/magento setup:install --backend-frontname=admin --session-save=db --db-host=127.0.0.1 --db-name=magento --db-user=magento --db-password=password --base-url=http://localhost --timezone=Europe/Amsterdam --currency=EUR --admin-user=exampleuser --admin-password=examplepassword123 --admin-email=user@example.com --admin-firstname=Example --admin-lastname=Example --use-rewrites=1 --use-sample-data && \
     php bin/magento deploy:mode:set developer && \
     if (( $(php -r 'echo substr(getenv("MAGENTO_VERSION"), 0, 5) == "2.3.3" ? "true" : "false";') = "true" )); then echo "applying vertex-compilation-issue.patch"; git apply vertex-compilation-issue.patch; fi && \
+    if [ "${SAMPLE_DATA}" = "true" ]; then mysql -u root magento -e 'ALTER TABLE `scconnector_google_feed_cl` auto_increment = 1;'; fi && \
     if [ "${SAMPLE_DATA}" = "true" ]; then php bin/magento sampledata:deploy; fi && \
     if [ "${SAMPLE_DATA}" = "true" ]; then php bin/magento setup:upgrade; fi && \
     php bin/magento setup:di:compile && \

@@ -18,6 +18,7 @@ RUN apt update --fix-missing && \
     curl -L https://artifacts.elastic.co/GPG-KEY-elasticsearch | apt-key add - && \
     echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" | tee -a /etc/apt/sources.list.d/elastic-7.x.list && \
     wget https://repo.mysql.com//mysql-apt-config_0.8.18-1_all.deb && \
+    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 467B942D3A79BD29 && \
     dpkg -i mysql-apt-config_0.8.18-1_all.deb && \
     apt update && \
     echo "[mysqld]\ndefault-authentication-plugin=mysql_native_password" > ~/.my.cnf && \
