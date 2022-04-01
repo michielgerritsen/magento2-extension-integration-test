@@ -49,16 +49,13 @@ RUN apt update --fix-missing && \
     mysql -u root -e "GRANT ALL PRIVILEGES ON * . * TO 'magento-test'@'%';" && \
     sleep 5 && \
     php bin/magento setup:install --backend-frontname=admin --session-save=db --db-host=127.0.0.1 --db-name=magento --db-user=magento --db-password=password --base-url=http://localhost --timezone=Europe/Amsterdam --currency=EUR --admin-user=exampleuser --admin-password=examplepassword123 --admin-email=user@example.com --admin-firstname=Example --admin-lastname=Example --use-rewrites=1 --use-sample-data && \
-    php bin/magento deploy:mode:set developer
-
-RUN /bin/bash -c "/usr/bin/mysqld_safe &" && \
-    sleep 5 && \
+    php bin/magento deploy:mode:set developer && \
     if (( $(php -r 'echo substr(getenv("MAGENTO_VERSION"), 0, 5) == "2.3.3" ? "true" : "false";') = "true" )); then echo "applying vertex-compilation-issue.patch"; git apply vertex-compilation-issue.patch; fi && \
     mysql -u root magento -e 'CREATE TABLE IF NOT EXISTS `scconnector_google_remove_cl` (`version_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT "Version ID", `entity_id` int(10) unsigned NOT NULL DEFAULT "0" COMMENT "Entity ID", PRIMARY KEY (`version_id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT="scconnector_google_remove_cl";' && \
     mysql -u root magento -e 'INSERT INTO `scconnector_google_remove_cl` (`version_id`, `entity_id`) VALUES ('1', '1');' && \
     mysql -u root magento -e 'alter table `scconnector_google_remove_cl` auto_increment = 1;' && \
     if [ "${SAMPLE_DATA}" = "true" ]; then php bin/magento sampledata:deploy; fi && \
-    if [ "${SAMPLE_DATA}" = "true" ]; then php bin/magento setup:upgrade; fi && \
+    if [ "${SAMPLE_DATA}" = "true" ]; then (php bin/magento setup:upgrade || php bin/magento setup:upgrade || php bin/magento setup:upgrade); fi && \
     php bin/magento setup:di:compile && \
     magerun2 indexer:reindex && \
     mkdir -p extensions && \
