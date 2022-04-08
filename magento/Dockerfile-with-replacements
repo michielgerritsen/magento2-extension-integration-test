@@ -11,6 +11,9 @@ ENV FLAT_TABLES=false
 COPY patches/vertex-compilation-issue.patch vertex-compilation-issue.patch
 COPY patches/79e90baca6442c0fb3627dd1fa1b083c8df4fa01.patch 79e90baca6442c0fb3627dd1fa1b083c8df4fa01.patch
 COPY patches/pr-33803.diff pr-33803.diff
+COPY patches/APSB22-12/MDVA-43395_EE_2.4.3-p1_COMPOSER_v1.patch MDVA-43395_EE_2.4.3-p1_COMPOSER_v1.patch
+COPY patches/APSB22-12/MDVA-43443_EE_2.4.2-p2_COMPOSER_v1.patch MDVA-43443_EE_2.4.2-p2_COMPOSER_v1.patch
+COPY patches/APSB22-12/MDVA-43443_EE_2.4.3-p1_COMPOSER_v1.patch MDVA-43443_EE_2.4.3-p1_COMPOSER_v1.patch
 
 RUN apt update --fix-missing && \
     export DEBIAN_FRONTEND=noninteractive && \
@@ -55,6 +58,9 @@ RUN composer install && \
     magerun2 indexer:reindex && \
     mkdir -p extensions && \
     composer config repositories.dev-extensions path extensions/* && \
+    echo "applying MDVA-43395_EE_2.4.3-p1_COMPOSER_v1.patch"; git apply MDVA-43395_EE_2.4.3-p1_COMPOSER_v1.patch && \
+    if (( $(php -r 'echo version_compare(getenv("MAGENTO_VERSION"), "2.4.2-p2", "<=") ? "true" : "false";') = "true" )); then echo "applying MDVA-43443_EE_2.4.2-p2_COMPOSER_v1.patch"; git apply MDVA-43443_EE_2.4.2-p2_COMPOSER_v1.patch; fi && \
+    if (( $(php -r 'echo version_compare(getenv("MAGENTO_VERSION"), "2.4.3", ">=") ? "true" : "false";') = "true" )); then echo "applying MDVA-43443_EE_2.4.3-p1_COMPOSER_v1.patch"; git apply MDVA-43443_EE_2.4.3-p1_COMPOSER_v1.patch; fi && \
     if (( $(php -r 'echo substr(getenv("MAGENTO_VERSION"), 0, 5) == "2.4.3" ? "true" : "false";') = "true" )); then git apply pr-33803.diff; rm pr-33803.diff; fi
 
 COPY patches/bundle-2684_dotmailer_integration_tests-2020-08-04-04-31-22.patch bundle-2684_dotmailer_integration_tests-2020-08-04-04-31-22.patch
