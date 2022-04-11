@@ -42,6 +42,7 @@ RUN apt update --fix-missing && \
     if [ -f "/data/vendor/magento/module-inventory-catalog/etc/communication.xml" ]; then sed -i 's/is_synchronous="false"//g' /data/vendor/magento/module-inventory-catalog/etc/communication.xml; fi && \
     if [ -f "/data/vendor/magento/module-inventory-sales/etc/communication.xml" ]; then sed -i 's/is_synchronous="false"//g' /data/vendor/magento/module-inventory-sales/etc/communication.xml; fi && \
     if [ -f "/data/vendor/magento/module-inventory-indexer/etc/communication.xml" ]; then sed -i 's/is_synchronous="false"//g' /data/vendor/magento/module-inventory-indexer/etc/communication.xml; fi && \
+    rm -rf vendor/magento/module-two-factor-auth/ && \
     service elasticsearch start && \
     /bin/bash -c "/usr/bin/mysqld_safe &" && \
     sleep 5 && \
@@ -55,7 +56,6 @@ RUN apt update --fix-missing && \
     php bin/magento deploy:mode:set developer && \
     if [ "${SAMPLE_DATA}" = "true" ]; then php bin/magento sampledata:deploy; fi && \
     if [ "${SAMPLE_DATA}" = "true" ]; then php bin/magento setup:upgrade; fi && \
-    php bin/magento module:disable Magento_TwoFactorAuth && \
     php bin/magento setup:di:compile && \
     magerun2 indexer:reindex && \
     mkdir -p extensions && \
