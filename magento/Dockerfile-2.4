@@ -43,6 +43,7 @@ RUN apt update --fix-missing && \
     if [ -f "/data/vendor/magento/module-inventory-sales/etc/communication.xml" ]; then sed -i 's/is_synchronous="false"//g' /data/vendor/magento/module-inventory-sales/etc/communication.xml; fi && \
     if [ -f "/data/vendor/magento/module-inventory-indexer/etc/communication.xml" ]; then sed -i 's/is_synchronous="false"//g' /data/vendor/magento/module-inventory-indexer/etc/communication.xml; fi && \
     rm -rf vendor/magento/module-two-factor-auth/ && \
+    composer dump-autoload && \
     service elasticsearch start && \
     /bin/bash -c "/usr/bin/mysqld_safe &" && \
     sleep 5 && \
