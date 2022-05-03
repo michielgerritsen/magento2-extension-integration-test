@@ -8,7 +8,7 @@ index 06c23ecd..628193f5 100644
  
 +header('Access-Control-Allow-Origin: *');
 +header('Access-Control-Allow-Methods: *');
-+header('Access-Control-Allow-Headers: DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Content-Range,Range,Authorization');
++header('Access-Control-Allow-Headers: DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Content-Range,Range,Authorization,Store');
 +
 +if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 +    http_response_code(200);
