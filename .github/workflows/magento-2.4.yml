@@ -104,13 +104,13 @@ jobs:
 
     # Step 3: Upload the images to Docker Hub.
     - name: Docker hub login
-      if: github.ref == 'refs/heads/build'
+      if: github.ref == 'refs/heads/master'
       run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
     - name: Push the image to Docker hub (without sample data)
-      if: github.ref == 'refs/heads/build' && matrix.cfg.SAMPLE_DATA == false
+      if: github.ref == 'refs/heads/master' && matrix.cfg.SAMPLE_DATA == false
       run: docker push michielgerritsen/magento-project-community-edition:${{ matrix.cfg.PHP_VERSION }}-magento${{ matrix.cfg.MAGENTO_VERSION }}
 
     - name: Push the image to Docker hub (with sample data)
-      if: github.ref == 'refs/heads/build' && matrix.cfg.SAMPLE_DATA == true
+      if: github.ref == 'refs/heads/master' && matrix.cfg.SAMPLE_DATA == true
       run: docker push michielgerritsen/magento-project-community-edition:${{ matrix.cfg.PHP_VERSION }}-magento${{ matrix.cfg.MAGENTO_VERSION }}-sample-data
