@@ -9,12 +9,8 @@ ENV CI=true
 ENV URL=http://localhost/
 ENV FLAT_TABLES=false
 
-COPY patches/vertex-compilation-issue.patch vertex-compilation-issue.patch
-COPY patches/79e90baca6442c0fb3627dd1fa1b083c8df4fa01.patch 79e90baca6442c0fb3627dd1fa1b083c8df4fa01.patch
-COPY patches/pr-33803.diff pr-33803.diff
-COPY patches/APSB22-12/MDVA-43395_EE_2.4.3-p1_COMPOSER_v1.patch MDVA-43395_EE_2.4.3-p1_COMPOSER_v1.patch
-COPY patches/APSB22-12/MDVA-43443_EE_2.4.2-p2_COMPOSER_v1.patch MDVA-43443_EE_2.4.2-p2_COMPOSER_v1.patch
-COPY patches/APSB22-12/MDVA-43443_EE_2.4.3-p1_COMPOSER_v1.patch MDVA-43443_EE_2.4.3-p1_COMPOSER_v1.patch
+COPY patches/ patches/
+COPY scripts/apply-2.4-patches.php scripts/apply-2.4-patches.php
 
 RUN apt update --fix-missing && \
     export DEBIAN_FRONTEND=noninteractive && \
@@ -35,7 +31,7 @@ RUN apt update --fix-missing && \
     curl -o magento.zip https://repo-magento-mirror.fooman.co.nz/dist/magento/$MAGENTO_TYPE/magento-$MAGENTO_TYPE-$MAGENTO_VERSION.zip && \
     unzip -q magento.zip -d . && \
     rm magento.zip && \
-    composer global require hirak/prestissimo && \
+    if (( $(php -r 'echo version_compare(getenv("MAGENTO_VERSION"), "2.4.2", "<=") ? "true" : "false";') = "true" )); then composer global require hirak/prestissimo; else rm -f /usr/local/bin/composer && ln -sv /usr/local/bin/composer2 /usr/local/bin/composer; fi && \
     composer config --unset repositories.0 && \
     composer config repositories.fooman composer https://repo-magento-mirror.fooman.co.nz/ && \
     composer install && \
@@ -61,13 +57,9 @@ RUN apt update --fix-missing && \
     magerun2 indexer:reindex && \
     mkdir -p extensions && \
     composer config repositories.dev-extensions path extensions/* && \
-    echo "applying MDVA-43395_EE_2.4.3-p1_COMPOSER_v1.patch"; git apply MDVA-43395_EE_2.4.3-p1_COMPOSER_v1.patch && \
-    if (( $(php -r 'echo version_compare(getenv("MAGENTO_VERSION"), "2.4.2-p2", "<=") ? "true" : "false";') = "true" )); then echo "applying MDVA-43443_EE_2.4.2-p2_COMPOSER_v1.patch"; git apply MDVA-43443_EE_2.4.2-p2_COMPOSER_v1.patch; fi && \
-    if (( $(php -r 'echo version_compare(getenv("MAGENTO_VERSION"), "2.4.3", ">=") ? "true" : "false";') = "true" )); then echo "applying MDVA-43443_EE_2.4.3-p1_COMPOSER_v1.patch"; git apply MDVA-43443_EE_2.4.3-p1_COMPOSER_v1.patch; fi && \
-    if (( $(php -r 'echo substr(getenv("MAGENTO_VERSION"), 0, 5) == "2.4.3" ? "true" : "false";') = "true" )); then git apply pr-33803.diff; rm pr-33803.diff; fi
+    php scripts/apply-2.4-patches.php && \
+    rm scripts/apply-2.4-patches.php
 
-COPY patches/bundle-2684_dotmailer_integration_tests-2020-08-04-04-31-22.patch bundle-2684_dotmailer_integration_tests-2020-08-04-04-31-22.patch
-COPY patches/cors.patch cors.patch
 COPY templates/install-config-mysql.php dev/tests/integration/etc/
 COPY templates/post-install-setup-command-config.php dev/tests/integration/etc/
 COPY templates/phpunit-unit.xml dev/tests/unit/phpunit.xml
@@ -78,9 +70,6 @@ COPY scripts/enable-flat-catalog enable-flat-catalog
 COPY scripts/change-base-url change-base-url
 
 RUN chmod +x enable-flat-catalog && chmod +x change-base-url
-
-RUN if [ "${MAGENTO_VERSION}" = "2.4.0" ]; then git apply bundle-2684_dotmailer_integration_tests-2020-08-04-04-31-22.patch; fi && rm bundle-2684_dotmailer_integration_tests-2020-08-04-04-31-22.patch
-RUN git apply cors.patch && rm cors.patch vertex-compilation-issue.patch
 
 ENTRYPOINT ["/bin/bash", "entrypoint.sh"]
 

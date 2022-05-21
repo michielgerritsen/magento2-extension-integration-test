@@ -1,0 +1,897 @@
+From 597b769f5918e11b58dc15ae7cc407477ee2c695 Mon Sep 17 00:00:00 2001
+From: Sergey Nezbritskiy <sergey.nezbritskiy@gmail.com>
+Date: Sun, 15 Aug 2021 17:55:34 +0300
+Subject: [PATCH 1/7] ISSUE-33802: ensure that deployment config will reload
+ its data, if the key was not found
+
+---
+ .../Framework/App/DeploymentConfig.php        | 33 +++++++---
+ .../App/Test/Unit/DeploymentConfigTest.php    | 64 +++++++++++--------
+ 2 files changed, 60 insertions(+), 37 deletions(-)
+
+diff --git a/vendor/magento/framework/App/DeploymentConfig.php b/vendor/magento/framework/App/DeploymentConfig.php
+index 6aeec2c2d019..e7fd1e86de8a 100644
+--- a/vendor/magento/framework/App/DeploymentConfig.php
++++ b/vendor/magento/framework/App/DeploymentConfig.php
+@@ -73,15 +73,13 @@ public function __construct(DeploymentConfig\Reader $reader, $overrideData = [])
+     public function get($key = null, $defaultValue = null)
+     {
+         $this->load();
+-        if ($key === null) {
+-            return $this->flatData;
+-        }
+-
+-        if (array_key_exists($key, $this->flatData) && $this->flatData[$key] === null) {
+-            return '';
++        $result = $this->getByKey($key);
++        if ($result === null) {
++            $this->resetData();
++            $this->load();
++            $result = $this->getByKey($key);
+         }
+-
+-        return $this->flatData[$key] ?? $defaultValue;
++        return $result ?? $defaultValue;
+     }
+ 
+     /**
+@@ -171,7 +169,7 @@ private function load()
+      * @return array
+      * @throws RuntimeException
+      */
+-    private function flattenParams(array $params, $path = null, array &$flattenResult = null) : array
++    private function flattenParams(array $params, $path = null, array &$flattenResult = null): array
+     {
+         if (null === $flattenResult) {
+             $flattenResult = [];
+@@ -195,4 +193,21 @@ private function flattenParams(array $params, $path = null, array &$flattenResul
+ 
+         return $flattenResult;
+     }
++
++    /**
++     * @param string|null $key
++     * @return array|mixed|string
++     */
++    protected function getByKey($key)
++    {
++        if ($key === null) {
++            return $this->flatData;
++        }
++
++        if (array_key_exists($key, $this->flatData) && $this->flatData[$key] === null) {
++            return '';
++        }
++
++        return $this->flatData[$key] ?? null;
++    }
+ }
+diff --git a/vendor/magento/framework/App/Test/Unit/DeploymentConfigTest.php b/vendor/magento/framework/App/Test/Unit/DeploymentConfigTest.php
+index 7a05b86ed050..0dc3691d6509 100644
+--- a/vendor/magento/framework/App/Test/Unit/DeploymentConfigTest.php
++++ b/vendor/magento/framework/App/Test/Unit/DeploymentConfigTest.php
+@@ -1,8 +1,10 @@
+ <?php
++
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
++
+ declare(strict_types=1);
+ 
+ namespace Magento\Framework\App\Test\Unit;
+@@ -20,12 +22,12 @@ class DeploymentConfigTest extends TestCase
+      */
+     private static $fixture
+         = [
+-            'configData1'   => 'scalar_value',
+-            'configData2'   => [
++            'configData1' => 'scalar_value',
++            'configData2' => [
+                 'foo' => 1,
+                 'bar' => ['baz' => 2],
+             ],
+-            'configData3'   => null,
++            'configData3' => null,
+             'test_override' => 'original',
+         ];
+ 
+@@ -34,16 +36,16 @@ class DeploymentConfigTest extends TestCase
+      */
+     private static $flattenedFixture
+         = [
+-            'configData1'         => 'scalar_value',
+-            'configData2'         => [
++            'configData1' => 'scalar_value',
++            'configData2' => [
+                 'foo' => 1,
+                 'bar' => ['baz' => 2],
+             ],
+-            'configData2/foo'     => 1,
+-            'configData2/bar'     => ['baz' => 2],
++            'configData2/foo' => 1,
++            'configData2/bar' => ['baz' => 2],
+             'configData2/bar/baz' => 2,
+-            'configData3'         => null,
+-            'test_override'       => 'overridden',
++            'configData3' => null,
++            'test_override' => 'overridden',
+         ];
+ 
+     /**
+@@ -69,32 +71,30 @@ class DeploymentConfigTest extends TestCase
+     /**
+      * @var MockObject
+      */
+-    private $reader;
++    private $readerMock;
+ 
+     public static function setUpBeforeClass(): void
+     {
+-        self::$fixtureConfig       = require __DIR__ . '/_files/config.php';
++        self::$fixtureConfig = require __DIR__ . '/_files/config.php';
+         self::$fixtureConfigMerged = require __DIR__ . '/_files/other/local_developer_merged.php';
+     }
+ 
+     protected function setUp(): void
+     {
+-        $this->reader                  = $this->createMock(Reader::class);
+-        $this->_deploymentConfig       = new DeploymentConfig(
+-            $this->reader,
++        $this->readerMock = $this->createMock(Reader::class);
++        $this->_deploymentConfig = new DeploymentConfig(
++            $this->readerMock,
+             ['test_override' => 'overridden']
+         );
+         $this->_deploymentConfigMerged = new DeploymentConfig(
+-            $this->reader,
++            $this->readerMock,
+             require __DIR__ . '/_files/other/local_developer.php'
+         );
+     }
+ 
+     public function testGetters(): void
+     {
+-        $this->reader->expects($this->once())->method('load')->willReturn(self::$fixture);
+-        $this->assertSame(self::$flattenedFixture, $this->_deploymentConfig->get());
+-        // second time to ensure loader will be invoked only once
++        $this->readerMock->expects($this->any())->method('load')->willReturn(self::$fixture);
+         $this->assertSame(self::$flattenedFixture, $this->_deploymentConfig->get());
+         $this->assertSame('scalar_value', $this->_deploymentConfig->getConfigData('configData1'));
+         $this->assertSame(self::$fixture['configData2'], $this->_deploymentConfig->getConfigData('configData2'));
+@@ -107,19 +107,19 @@ public function testGetters(): void
+ 
+     public function testIsAvailable(): void
+     {
+-        $this->reader->expects($this->once())->method('load')->willReturn(
++        $this->readerMock->expects($this->once())->method('load')->willReturn(
+             [
+                 ConfigOptionsListConstants::CONFIG_PATH_INSTALL_DATE => 1,
+             ]
+         );
+-        $object = new DeploymentConfig($this->reader);
++        $object = new DeploymentConfig($this->readerMock);
+         $this->assertTrue($object->isAvailable());
+     }
+ 
+     public function testNotAvailable(): void
+     {
+-        $this->reader->expects($this->once())->method('load')->willReturn([]);
+-        $object = new DeploymentConfig($this->reader);
++        $this->readerMock->expects($this->once())->method('load')->willReturn([]);
++        $object = new DeploymentConfig($this->readerMock);
+         $this->assertFalse($object->isAvailable());
+     }
+ 
+@@ -128,8 +128,8 @@ public function testNotAvailable(): void
+      */
+     public function testNotAvailableThenAvailable(): void
+     {
+-        $this->reader->expects($this->once())->method('load')->willReturn(['Test']);
+-        $object = new DeploymentConfig($this->reader);
++        $this->readerMock->expects($this->once())->method('load')->willReturn(['Test']);
++        $object = new DeploymentConfig($this->readerMock);
+         $this->assertFalse($object->isAvailable());
+         $this->assertFalse($object->isAvailable());
+     }
+@@ -142,8 +142,8 @@ public function testKeyCollision(array $data): void
+     {
+         $this->expectException('Exception');
+         $this->expectExceptionMessage('Key collision');
+-        $this->reader->expects($this->once())->method('load')->willReturn($data);
+-        $object = new DeploymentConfig($this->reader);
++        $this->readerMock->expects($this->once())->method('load')->willReturn($data);
++        $object = new DeploymentConfig($this->readerMock);
+         $object->get();
+     }
+ 
+@@ -163,7 +163,7 @@ public function keyCollisionDataProvider(): array
+ 
+     public function testResetData(): void
+     {
+-        $this->reader->expects($this->exactly(2))->method('load')->willReturn(self::$fixture);
++        $this->readerMock->expects($this->exactly(2))->method('load')->willReturn(self::$fixture);
+         $this->assertSame(self::$flattenedFixture, $this->_deploymentConfig->get());
+         $this->_deploymentConfig->resetData();
+         // second time to ensure loader will be invoked only once after reset
+@@ -173,9 +173,17 @@ public function testResetData(): void
+ 
+     public function testIsDbAvailable(): void
+     {
+-        $this->reader->expects($this->exactly(2))->method('load')->willReturnOnConsecutiveCalls([], ['db' => []]);
++        $this->readerMock->expects($this->exactly(2))->method('load')->willReturnOnConsecutiveCalls([], ['db' => []]);
+         $this->assertFalse($this->_deploymentConfig->isDbAvailable());
+         $this->_deploymentConfig->resetData();
+         $this->assertTrue($this->_deploymentConfig->isDbAvailable());
+     }
++
++    public function testReloadDataOnMissingConfig(): void
++    {
++        $this->readerMock->expects($this->exactly(2))->method('load')->willReturn(self::$fixture);
++        $defaultValue = 'some_default_value';
++        $result = $this->_deploymentConfig->get('missing/key', $defaultValue);
++        $this->assertEquals($defaultValue, $result);
++    }
+ }
+
+From c1cefe7633bc1da2e2b5e28d14ea3a8167f66ca0 Mon Sep 17 00:00:00 2001
+From: Sergey Nezbritskiy <sergey.nezbritskiy@gmail.com>
+Date: Sun, 15 Aug 2021 18:19:08 +0300
+Subject: [PATCH 2/7] ISSE-33802: load config on empty cache only
+
+---
+ vendor/magento/framework/App/DeploymentConfig.php     | 6 ++----
+ .../Framework/App/Test/Unit/DeploymentConfigTest.php        | 6 +++---
+ 2 files changed, 5 insertions(+), 7 deletions(-)
+
+diff --git a/vendor/magento/framework/App/DeploymentConfig.php b/vendor/magento/framework/App/DeploymentConfig.php
+index e7fd1e86de8a..9f5c352d659e 100644
+--- a/vendor/magento/framework/App/DeploymentConfig.php
++++ b/vendor/magento/framework/App/DeploymentConfig.php
+@@ -38,7 +38,7 @@ class DeploymentConfig
+      *
+      * @var array
+      */
+-    private $flatData;
++    private $flatData = [];
+ 
+     /**
+      * Injected configuration data
+@@ -72,7 +72,6 @@ public function __construct(DeploymentConfig\Reader $reader, $overrideData = [])
+      */
+     public function get($key = null, $defaultValue = null)
+     {
+-        $this->load();
+         $result = $this->getByKey($key);
+         if ($result === null) {
+             $this->resetData();
+@@ -201,9 +200,8 @@ private function flattenParams(array $params, $path = null, array &$flattenResul
+     protected function getByKey($key)
+     {
+         if ($key === null) {
+-            return $this->flatData;
++            return $this->flatData ?: null;
+         }
+-
+         if (array_key_exists($key, $this->flatData) && $this->flatData[$key] === null) {
+             return '';
+         }
+diff --git a/vendor/magento/framework/App/Test/Unit/DeploymentConfigTest.php b/vendor/magento/framework/App/Test/Unit/DeploymentConfigTest.php
+index 0dc3691d6509..39b16a59a56b 100644
+--- a/vendor/magento/framework/App/Test/Unit/DeploymentConfigTest.php
++++ b/vendor/magento/framework/App/Test/Unit/DeploymentConfigTest.php
+@@ -163,7 +163,7 @@ public function keyCollisionDataProvider(): array
+ 
+     public function testResetData(): void
+     {
+-        $this->readerMock->expects($this->exactly(2))->method('load')->willReturn(self::$fixture);
++        $this->readerMock->expects($this->once())->method('load')->willReturn(self::$fixture);
+         $this->assertSame(self::$flattenedFixture, $this->_deploymentConfig->get());
+         $this->_deploymentConfig->resetData();
+         // second time to ensure loader will be invoked only once after reset
+@@ -179,9 +179,9 @@ public function testIsDbAvailable(): void
+         $this->assertTrue($this->_deploymentConfig->isDbAvailable());
+     }
+ 
+-    public function testReloadDataOnMissingConfig(): void
++    public function testResetDataOnMissingConfig(): void
+     {
+-        $this->readerMock->expects($this->exactly(2))->method('load')->willReturn(self::$fixture);
++        $this->readerMock->expects($this->once())->method('load')->willReturn(self::$fixture);
+         $defaultValue = 'some_default_value';
+         $result = $this->_deploymentConfig->get('missing/key', $defaultValue);
+         $this->assertEquals($defaultValue, $result);
+
+From a2e458a111c48a48eec07f4d723a2437627c62b8 Mon Sep 17 00:00:00 2001
+From: Sergey Nezbritskiy <sergey.nezbritskiy@gmail.com>
+Date: Sun, 15 Aug 2021 18:26:53 +0300
+Subject: [PATCH 3/7] ISS-33802: update test phpdocs
+
+---
+ .../App/Test/Unit/DeploymentConfigTest.php    | 76 ++++++++++++++-----
+ 1 file changed, 57 insertions(+), 19 deletions(-)
+
+diff --git a/vendor/magento/framework/App/Test/Unit/DeploymentConfigTest.php b/vendor/magento/framework/App/Test/Unit/DeploymentConfigTest.php
+index 39b16a59a56b..6ebda9d895a3 100644
+--- a/vendor/magento/framework/App/Test/Unit/DeploymentConfigTest.php
++++ b/vendor/magento/framework/App/Test/Unit/DeploymentConfigTest.php
+@@ -12,6 +12,8 @@
+ use Magento\Framework\App\DeploymentConfig;
+ use Magento\Framework\App\DeploymentConfig\Reader;
+ use Magento\Framework\Config\ConfigOptionsListConstants;
++use Magento\Framework\Exception\FileSystemException;
++use Magento\Framework\Exception\RuntimeException;
+ use PHPUnit\Framework\MockObject\MockObject;
+ use PHPUnit\Framework\TestCase;
+ 
+@@ -61,7 +63,7 @@ class DeploymentConfigTest extends TestCase
+     /**
+      * @var DeploymentConfig
+      */
+-    protected $_deploymentConfig;
++    protected $deploymentConfig;
+ 
+     /**
+      * @var DeploymentConfig
+@@ -82,7 +84,7 @@ public static function setUpBeforeClass(): void
+     protected function setUp(): void
+     {
+         $this->readerMock = $this->createMock(Reader::class);
+-        $this->_deploymentConfig = new DeploymentConfig(
++        $this->deploymentConfig = new DeploymentConfig(
+             $this->readerMock,
+             ['test_override' => 'overridden']
+         );
+@@ -92,19 +94,29 @@ protected function setUp(): void
+         );
+     }
+ 
++    /**
++     * @return void
++     * @throws FileSystemException
++     * @throws RuntimeException
++     */
+     public function testGetters(): void
+     {
+         $this->readerMock->expects($this->any())->method('load')->willReturn(self::$fixture);
+-        $this->assertSame(self::$flattenedFixture, $this->_deploymentConfig->get());
+-        $this->assertSame('scalar_value', $this->_deploymentConfig->getConfigData('configData1'));
+-        $this->assertSame(self::$fixture['configData2'], $this->_deploymentConfig->getConfigData('configData2'));
+-        $this->assertSame(self::$fixture['configData3'], $this->_deploymentConfig->getConfigData('configData3'));
+-        $this->assertSame('', $this->_deploymentConfig->get('configData3'));
+-        $this->assertSame('defaultValue', $this->_deploymentConfig->get('invalid_key', 'defaultValue'));
+-        $this->assertNull($this->_deploymentConfig->getConfigData('invalid_key'));
+-        $this->assertSame('overridden', $this->_deploymentConfig->get('test_override'));
++        $this->assertSame(self::$flattenedFixture, $this->deploymentConfig->get());
++        $this->assertSame('scalar_value', $this->deploymentConfig->getConfigData('configData1'));
++        $this->assertSame(self::$fixture['configData2'], $this->deploymentConfig->getConfigData('configData2'));
++        $this->assertSame(self::$fixture['configData3'], $this->deploymentConfig->getConfigData('configData3'));
++        $this->assertSame('', $this->deploymentConfig->get('configData3'));
++        $this->assertSame('defaultValue', $this->deploymentConfig->get('invalid_key', 'defaultValue'));
++        $this->assertNull($this->deploymentConfig->getConfigData('invalid_key'));
++        $this->assertSame('overridden', $this->deploymentConfig->get('test_override'));
+     }
+ 
++    /**
++     * @return void
++     * @throws FileSystemException
++     * @throws RuntimeException
++     */
+     public function testIsAvailable(): void
+     {
+         $this->readerMock->expects($this->once())->method('load')->willReturn(
+@@ -116,6 +128,11 @@ public function testIsAvailable(): void
+         $this->assertTrue($object->isAvailable());
+     }
+ 
++    /**
++     * @return void
++     * @throws FileSystemException
++     * @throws RuntimeException
++     */
+     public function testNotAvailable(): void
+     {
+         $this->readerMock->expects($this->once())->method('load')->willReturn([]);
+@@ -125,6 +142,10 @@ public function testNotAvailable(): void
+ 
+     /**
+      * test if the configuration changes during the same request, the configuration remain the same
++     *
++     * @return void
++     * @throws FileSystemException
++     * @throws RuntimeException
+      */
+     public function testNotAvailableThenAvailable(): void
+     {
+@@ -135,8 +156,10 @@ public function testNotAvailableThenAvailable(): void
+     }
+ 
+     /**
+-     * @param array $data
+      * @dataProvider keyCollisionDataProvider
++     * @param array $data
++     * @throws FileSystemException
++     * @throws RuntimeException
+      */
+     public function testKeyCollision(array $data): void
+     {
+@@ -161,29 +184,44 @@ public function keyCollisionDataProvider(): array
+         ];
+     }
+ 
++    /**
++     * @return void
++     * @throws FileSystemException
++     * @throws RuntimeException
++     */
+     public function testResetData(): void
+     {
+         $this->readerMock->expects($this->once())->method('load')->willReturn(self::$fixture);
+-        $this->assertSame(self::$flattenedFixture, $this->_deploymentConfig->get());
+-        $this->_deploymentConfig->resetData();
++        $this->assertSame(self::$flattenedFixture, $this->deploymentConfig->get());
++        $this->deploymentConfig->resetData();
+         // second time to ensure loader will be invoked only once after reset
+-        $this->assertSame(self::$flattenedFixture, $this->_deploymentConfig->get());
+-        $this->assertSame(self::$flattenedFixture, $this->_deploymentConfig->get());
++        $this->assertSame(self::$flattenedFixture, $this->deploymentConfig->get());
++        $this->assertSame(self::$flattenedFixture, $this->deploymentConfig->get());
+     }
+ 
++    /**
++     * @return void
++     * @throws FileSystemException
++     * @throws RuntimeException
++     */
+     public function testIsDbAvailable(): void
+     {
+         $this->readerMock->expects($this->exactly(2))->method('load')->willReturnOnConsecutiveCalls([], ['db' => []]);
+-        $this->assertFalse($this->_deploymentConfig->isDbAvailable());
+-        $this->_deploymentConfig->resetData();
+-        $this->assertTrue($this->_deploymentConfig->isDbAvailable());
++        $this->assertFalse($this->deploymentConfig->isDbAvailable());
++        $this->deploymentConfig->resetData();
++        $this->assertTrue($this->deploymentConfig->isDbAvailable());
+     }
+ 
++    /**
++     * @return void
++     * @throws FileSystemException
++     * @throws RuntimeException
++     */
+     public function testResetDataOnMissingConfig(): void
+     {
+         $this->readerMock->expects($this->once())->method('load')->willReturn(self::$fixture);
+         $defaultValue = 'some_default_value';
+-        $result = $this->_deploymentConfig->get('missing/key', $defaultValue);
++        $result = $this->deploymentConfig->get('missing/key', $defaultValue);
+         $this->assertEquals($defaultValue, $result);
+     }
+ }
+
+From d0191e74f1fad7449b703b1281f30ecee53d1c53 Mon Sep 17 00:00:00 2001
+From: Sergey Nezbritskiy <sergey.nezbritskiy@gmail.com>
+Date: Sun, 15 Aug 2021 18:51:44 +0300
+Subject: [PATCH 4/7] ISS-33802: refactor DeploymentConfig class in order to
+ ensure that all methods follow the same reload logic
+
+---
+ .../Framework/App/DeploymentConfig.php        | 103 ++++++++++--------
+ .../App/Test/Unit/DeploymentConfigTest.php    |   5 +-
+ 2 files changed, 57 insertions(+), 51 deletions(-)
+
+diff --git a/vendor/magento/framework/App/DeploymentConfig.php b/vendor/magento/framework/App/DeploymentConfig.php
+index 9f5c352d659e..82e17f6a83f9 100644
+--- a/vendor/magento/framework/App/DeploymentConfig.php
++++ b/vendor/magento/framework/App/DeploymentConfig.php
+@@ -38,7 +38,7 @@ class DeploymentConfig
+      *
+      * @var array
+      */
+-    private $flatData = [];
++    private $flatData;
+ 
+     /**
+      * Injected configuration data
+@@ -55,7 +55,7 @@ class DeploymentConfig
+      * @param DeploymentConfig\Reader $reader
+      * @param array $overrideData
+      */
+-    public function __construct(DeploymentConfig\Reader $reader, $overrideData = [])
++    public function __construct(DeploymentConfig\Reader $reader, array $overrideData = [])
+     {
+         $this->reader = $reader;
+         $this->overrideData = $overrideData;
+@@ -64,63 +64,50 @@ public function __construct(DeploymentConfig\Reader $reader, $overrideData = [])
+     /**
+      * Gets data from flattened data
+      *
+-     * @param string $key
++     * @param string|null $key
+      * @param mixed $defaultValue
+      * @return mixed|null
+      * @throws FileSystemException
+      * @throws RuntimeException
+      */
+-    public function get($key = null, $defaultValue = null)
++    public function get(string $key = null, $defaultValue = null)
+     {
+         $result = $this->getByKey($key);
+         if ($result === null) {
+-            $this->resetData();
+-            $this->load();
++            $this->reloadData();
+             $result = $this->getByKey($key);
+         }
+         return $result ?? $defaultValue;
+     }
+ 
+-    /**
+-     * Checks if data available
+-     *
+-     * @return bool
+-     * @throws FileSystemException
+-     * @throws RuntimeException
+-     */
+-    public function isAvailable()
+-    {
+-        $this->load();
+-        return isset($this->flatData[ConfigOptionsListConstants::CONFIG_PATH_INSTALL_DATE]);
+-    }
+-
+     /**
+      * Gets a value specified key from config data
+      *
+-     * @param string $key
++     * @param string|null $key
+      * @return null|mixed
+      * @throws FileSystemException
+      * @throws RuntimeException
+      */
+-    public function getConfigData($key = null)
++    public function getConfigData(string $key = null)
+     {
+-        $this->load();
+-
+-        if ($key !== null && !isset($this->data[$key])) {
+-            return null;
++        $result = $this->getConfigDataByKey($key);
++        if ($result === null) {
++            $this->reloadData();
++            $result = $this->getConfigDataByKey($key);
+         }
+-
+-        return $this->data[$key] ?? $this->data;
++        return $result;
+     }
+ 
+     /**
+-     * Resets config data
++     * Checks if data available
+      *
+-     * @return void
++     * @return bool
++     * @throws FileSystemException
++     * @throws RuntimeException
+      */
+-    public function resetData()
++    public function isAvailable(): bool
+     {
+-        $this->data = null;
++        return $this->get(ConfigOptionsListConstants::CONFIG_PATH_INSTALL_DATE) !== null;
+     }
+ 
+     /**
+@@ -131,10 +118,20 @@ public function resetData()
+      * @throws RuntimeException
+      * @since 100.1.3
+      */
+-    public function isDbAvailable()
++    public function isDbAvailable(): bool
+     {
+-        $this->load();
+-        return isset($this->data['db']);
++        return $this->getConfigData('db') !== null;
++    }
++
++    /**
++     * Resets config data
++     *
++     * @return void
++     */
++    public function resetData(): void
++    {
++        $this->data = null;
++        $this->flatData = null;
+     }
+ 
+     /**
+@@ -144,16 +141,14 @@ public function isDbAvailable()
+      * @throws FileSystemException
+      * @throws RuntimeException
+      */
+-    private function load()
++    private function reloadData(): void
+     {
+-        if (empty($this->data)) {
+-            $this->data = $this->reader->load();
+-            if ($this->overrideData) {
+-                $this->data = array_replace($this->data, $this->overrideData);
+-            }
+-            // flatten data for config retrieval using get()
+-            $this->flatData = $this->flattenParams($this->data);
++        $this->data = $this->reader->load();
++        if ($this->overrideData) {
++            $this->data = array_replace($this->data, $this->overrideData);
+         }
++        // flatten data for config retrieval using get()
++        $this->flatData = $this->flattenParams($this->data);
+     }
+ 
+     /**
+@@ -163,12 +158,12 @@ private function load()
+      * each level of array is accessible by path key
+      *
+      * @param array $params
+-     * @param string $path
+-     * @param array $flattenResult
++     * @param string|null $path
++     * @param array|null $flattenResult
+      * @return array
+      * @throws RuntimeException
+      */
+-    private function flattenParams(array $params, $path = null, array &$flattenResult = null): array
++    private function flattenParams(array $params, ?string $path = null, array &$flattenResult = null): array
+     {
+         if (null === $flattenResult) {
+             $flattenResult = [];
+@@ -195,17 +190,29 @@ private function flattenParams(array $params, $path = null, array &$flattenResul
+ 
+     /**
+      * @param string|null $key
+-     * @return array|mixed|string
++     * @return mixed|null
+      */
+-    protected function getByKey($key)
++    private function getByKey(?string $key)
+     {
+         if ($key === null) {
+             return $this->flatData ?: null;
+         }
+-        if (array_key_exists($key, $this->flatData) && $this->flatData[$key] === null) {
++        if (is_array($this->flatData) && array_key_exists($key, $this->flatData) && $this->flatData[$key] === null) {
+             return '';
+         }
+ 
+         return $this->flatData[$key] ?? null;
+     }
++
++    /**
++     * @param string|null $key
++     * @return mixed|null
++     */
++    private function getConfigDataByKey(?string $key)
++    {
++        if ($key === null) {
++            return $this->data;
++        }
++        return $this->data[$key] ?? null;
++    }
+ }
+diff --git a/vendor/magento/framework/App/Test/Unit/DeploymentConfigTest.php b/vendor/magento/framework/App/Test/Unit/DeploymentConfigTest.php
+index 6ebda9d895a3..dbc1d1833ac0 100644
+--- a/vendor/magento/framework/App/Test/Unit/DeploymentConfigTest.php
++++ b/vendor/magento/framework/App/Test/Unit/DeploymentConfigTest.php
+@@ -149,7 +149,7 @@ public function testNotAvailable(): void
+      */
+     public function testNotAvailableThenAvailable(): void
+     {
+-        $this->readerMock->expects($this->once())->method('load')->willReturn(['Test']);
++        $this->readerMock->expects($this->exactly(2))->method('load')->willReturn(['Test']);
+         $object = new DeploymentConfig($this->readerMock);
+         $this->assertFalse($object->isAvailable());
+         $this->assertFalse($object->isAvailable());
+@@ -191,7 +191,7 @@ public function keyCollisionDataProvider(): array
+      */
+     public function testResetData(): void
+     {
+-        $this->readerMock->expects($this->once())->method('load')->willReturn(self::$fixture);
++        $this->readerMock->expects($this->exactly(2))->method('load')->willReturn(self::$fixture);
+         $this->assertSame(self::$flattenedFixture, $this->deploymentConfig->get());
+         $this->deploymentConfig->resetData();
+         // second time to ensure loader will be invoked only once after reset
+@@ -208,7 +208,6 @@ public function testIsDbAvailable(): void
+     {
+         $this->readerMock->expects($this->exactly(2))->method('load')->willReturnOnConsecutiveCalls([], ['db' => []]);
+         $this->assertFalse($this->deploymentConfig->isDbAvailable());
+-        $this->deploymentConfig->resetData();
+         $this->assertTrue($this->deploymentConfig->isDbAvailable());
+     }
+ 
+
+From f72e25f8670fc1b641992f6d0bee25f07cc1590c Mon Sep 17 00:00:00 2001
+From: Sergey Nezbritskiy <sergey.nezbritskiy@gmail.com>
+Date: Sun, 15 Aug 2021 19:34:57 +0300
+Subject: [PATCH 5/7] ISS-33802: revert backward incompatible changes
+
+---
+ .../Framework/App/DeploymentConfig.php        | 25 +++++++++++++------
+ 1 file changed, 17 insertions(+), 8 deletions(-)
+
+diff --git a/vendor/magento/framework/App/DeploymentConfig.php b/vendor/magento/framework/App/DeploymentConfig.php
+index 82e17f6a83f9..6ce0fd6386f7 100644
+--- a/vendor/magento/framework/App/DeploymentConfig.php
++++ b/vendor/magento/framework/App/DeploymentConfig.php
+@@ -31,14 +31,14 @@ class DeploymentConfig
+      *
+      * @var array
+      */
+-    private $data;
++    private $data = [];
+ 
+     /**
+      * Flattened data
+      *
+      * @var array
+      */
+-    private $flatData;
++    private $flatData = [];
+ 
+     /**
+      * Injected configuration data
+@@ -72,6 +72,12 @@ public function __construct(DeploymentConfig\Reader $reader, array $overrideData
+      */
+     public function get(string $key = null, $defaultValue = null)
+     {
++        if ($key === null) {
++            if (empty($this->flatData)) {
++                $this->reloadData();
++            }
++            return $this->flatData;
++        }
+         $result = $this->getByKey($key);
+         if ($result === null) {
+             $this->reloadData();
+@@ -90,6 +96,12 @@ public function get(string $key = null, $defaultValue = null)
+      */
+     public function getConfigData(string $key = null)
+     {
++        if ($key === null) {
++            if (empty($this->data)) {
++                $this->reloadData();
++            }
++            return $this->data;
++        }
+         $result = $this->getConfigDataByKey($key);
+         if ($result === null) {
+             $this->reloadData();
+@@ -130,8 +142,8 @@ public function isDbAvailable(): bool
+      */
+     public function resetData(): void
+     {
+-        $this->data = null;
+-        $this->flatData = null;
++        $this->data = [];
++        $this->flatData = [];
+     }
+ 
+     /**
+@@ -197,7 +209,7 @@ private function getByKey(?string $key)
+         if ($key === null) {
+             return $this->flatData ?: null;
+         }
+-        if (is_array($this->flatData) && array_key_exists($key, $this->flatData) && $this->flatData[$key] === null) {
++        if (array_key_exists($key, $this->flatData) && $this->flatData[$key] === null) {
+             return '';
+         }
+ 
+@@ -210,9 +222,6 @@ private function getByKey(?string $key)
+      */
+     private function getConfigDataByKey(?string $key)
+     {
+-        if ($key === null) {
+-            return $this->data;
+-        }
+         return $this->data[$key] ?? null;
+     }
+ }
+
+From 5da5972e680c5a9ea9cfd0e35fc675203d9bb77e Mon Sep 17 00:00:00 2001
+From: Sergey Nezbritskiy <sergey.nezbritskiy@gmail.com>
+Date: Mon, 16 Aug 2021 10:48:13 +0300
+Subject: [PATCH 6/7] ISS-33802: revert semantic versioning changes
+
+---
+ .../Magento/Framework/App/DeploymentConfig.php     | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/vendor/magento/framework/App/DeploymentConfig.php b/vendor/magento/framework/App/DeploymentConfig.php
+index 6ce0fd6386f7..14be08ca1729 100644
+--- a/vendor/magento/framework/App/DeploymentConfig.php
++++ b/vendor/magento/framework/App/DeploymentConfig.php
+@@ -55,7 +55,7 @@ class DeploymentConfig
+      * @param DeploymentConfig\Reader $reader
+      * @param array $overrideData
+      */
+-    public function __construct(DeploymentConfig\Reader $reader, array $overrideData = [])
++    public function __construct(DeploymentConfig\Reader $reader, $overrideData = [])
+     {
+         $this->reader = $reader;
+         $this->overrideData = $overrideData;
+@@ -64,13 +64,13 @@ public function __construct(DeploymentConfig\Reader $reader, array $overrideData
+     /**
+      * Gets data from flattened data
+      *
+-     * @param string|null $key
++     * @param string $key
+      * @param mixed $defaultValue
+      * @return mixed|null
+      * @throws FileSystemException
+      * @throws RuntimeException
+      */
+-    public function get(string $key = null, $defaultValue = null)
++    public function get($key = null, $defaultValue = null)
+     {
+         if ($key === null) {
+             if (empty($this->flatData)) {
+@@ -94,7 +94,7 @@ public function get(string $key = null, $defaultValue = null)
+      * @throws FileSystemException
+      * @throws RuntimeException
+      */
+-    public function getConfigData(string $key = null)
++    public function getConfigData($key = null)
+     {
+         if ($key === null) {
+             if (empty($this->data)) {
+@@ -117,7 +117,7 @@ public function getConfigData(string $key = null)
+      * @throws FileSystemException
+      * @throws RuntimeException
+      */
+-    public function isAvailable(): bool
++    public function isAvailable()
+     {
+         return $this->get(ConfigOptionsListConstants::CONFIG_PATH_INSTALL_DATE) !== null;
+     }
+@@ -130,7 +130,7 @@ public function isAvailable(): bool
+      * @throws RuntimeException
+      * @since 100.1.3
+      */
+-    public function isDbAvailable(): bool
++    public function isDbAvailable()
+     {
+         return $this->getConfigData('db') !== null;
+     }
+@@ -140,7 +140,7 @@ public function isDbAvailable(): bool
+      *
+      * @return void
+      */
+-    public function resetData(): void
++    public function resetData()
+     {
+         $this->data = [];
+         $this->flatData = [];
+
+From acda6b94794b0e09759c8e8ff1d4d2f30b52cde0 Mon Sep 17 00:00:00 2001
+From: Sergey Nezbritskiy <sergey.nezbritskiy@gmail.com>
+Date: Mon, 16 Aug 2021 10:50:43 +0300
+Subject: [PATCH 7/7] ISS-33802: remove dead code
+
+---
+ vendor/magento/framework/App/DeploymentConfig.php | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/vendor/magento/framework/App/DeploymentConfig.php b/vendor/magento/framework/App/DeploymentConfig.php
+index 14be08ca1729..3f6ee187ecc2 100644
+--- a/vendor/magento/framework/App/DeploymentConfig.php
++++ b/vendor/magento/framework/App/DeploymentConfig.php
+@@ -206,9 +206,6 @@ private function flattenParams(array $params, ?string $path = null, array &$flat
+      */
+     private function getByKey(?string $key)
+     {
+-        if ($key === null) {
+-            return $this->flatData ?: null;
+-        }
+         if (array_key_exists($key, $this->flatData) && $this->flatData[$key] === null) {
+             return '';
+         }
