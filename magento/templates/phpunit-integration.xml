@@ -16,7 +16,6 @@
     <!-- Test suites definition -->
     <testsuites>
         <testsuite name="Magento Integration Tests">
-            <directory suffix="Test.php">/data/extensions/Test/Integration</directory>
             <directory suffix="Test.php">/data/extensions/**/Test/Integration</directory>
         </testsuite>
     </testsuites>
