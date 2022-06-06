@@ -28,10 +28,10 @@ RUN apt update --fix-missing && \
     echo 'memory_limit = 4G' >> /usr/local/etc/php/conf.d/memory-limit-php.ini && \
     echo 'max_execution_time = 300' >> /usr/local/etc/php/conf.d/memory-limit-php.ini && \
     rm /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && \
+    if (( $(php -r 'echo version_compare(getenv("MAGENTO_VERSION"), "2.4.2", "<=") ? "true" : "false";') = "true" )); then composer global require hirak/prestissimo; else rm -f /usr/local/bin/composer && ln -sv /usr/local/bin/composer2 /usr/local/bin/composer; fi && \
     curl -o magento.zip https://repo-magento-mirror.fooman.co.nz/dist/magento/$MAGENTO_TYPE/magento-$MAGENTO_TYPE-$MAGENTO_VERSION.zip && \
     unzip -q magento.zip -d . && \
     rm magento.zip && \
-    if (( $(php -r 'echo version_compare(getenv("MAGENTO_VERSION"), "2.4.2", "<=") ? "true" : "false";') = "true" )); then composer global require hirak/prestissimo; else rm -f /usr/local/bin/composer && ln -sv /usr/local/bin/composer2 /usr/local/bin/composer; fi && \
     composer config --unset repositories.0 && \
     composer config repositories.fooman composer https://repo-magento-mirror.fooman.co.nz/ && \
     composer install && \
@@ -56,6 +56,7 @@ RUN apt update --fix-missing && \
     magerun2 indexer:reindex && \
     mkdir -p extensions && \
     composer config repositories.dev-extensions path extensions/* && \
+    composer require --dev phpstan/phpstan:~1.7 bitexpert/phpstan-magento && \
     php scripts/apply-2.4-patches.php && \
     rm scripts/apply-2.4-patches.php
 

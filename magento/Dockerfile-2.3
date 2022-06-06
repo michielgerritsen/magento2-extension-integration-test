@@ -9,6 +9,7 @@ ENV CI=true
 ENV URL=http://localhost/
 ENV FLAT_TABLES=false
 
+COPY scripts/install-phpstan.php scripts/install-phpstan.php
 COPY patches/vertex-compilation-issue.patch vertex-compilation-issue.patch
 COPY patches/APSB22-12/MDVA-43395_EE_2.4.3-p1_COMPOSER_v1.patch MDVA-43395_EE_2.4.3-p1_COMPOSER_v1.patch
 COPY patches/APSB22-12/MDVA-43443_EE_2.3.4_COMPOSER_v1.patch MDVA-43443_EE_2.3.4_COMPOSER_v1.patch
@@ -65,7 +66,9 @@ RUN apt update --fix-missing && \
     php bin/magento setup:di:compile && \
     php bin/magento indexer:reindex && \
     mkdir -p extensions && \
-    composer config repositories.dev-extensions path extensions/*
+    composer config repositories.dev-extensions path extensions/* && \
+    php scripts/install-phpstan.php && \
+    rm scripts/install-phpstan.php
 
 COPY patches/cors.patch cors.patch
 COPY templates/install-config-mysql.php dev/tests/integration/etc/
