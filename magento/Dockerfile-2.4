@@ -1,7 +1,7 @@
 ARG PHP_VERSION=php74-fpm
 FROM srcoder/development-php:${PHP_VERSION}
 
-ARG MAGENTO_VERSION=2.4.1
+ARG MAGENTO_VERSION=2.4.4
 ARG MAGENTO_TYPE=project-community-edition
 ARG SAMPLE_DATA=false
 
@@ -35,6 +35,7 @@ RUN apt update --fix-missing && \
     composer config --unset repositories.0 && \
     composer config repositories.fooman composer https://repo-magento-mirror.fooman.co.nz/ && \
     composer install && \
+    composer require monolog/monolog:2.6.0 && \
     if [ -f "/data/vendor/magento/module-inventory-catalog/etc/communication.xml" ]; then sed -i 's/is_synchronous="false"//g' /data/vendor/magento/module-inventory-catalog/etc/communication.xml; fi && \
     if [ -f "/data/vendor/magento/module-inventory-sales/etc/communication.xml" ]; then sed -i 's/is_synchronous="false"//g' /data/vendor/magento/module-inventory-sales/etc/communication.xml; fi && \
     if [ -f "/data/vendor/magento/module-inventory-indexer/etc/communication.xml" ]; then sed -i 's/is_synchronous="false"//g' /data/vendor/magento/module-inventory-indexer/etc/communication.xml; fi && \
