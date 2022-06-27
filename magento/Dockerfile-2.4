@@ -11,6 +11,7 @@ ENV FLAT_TABLES=false
 
 COPY patches/ patches/
 COPY scripts/apply-2.4-patches.php scripts/apply-2.4-patches.php
+COPY scripts/downgrade-monolog.php scripts/downgrade-monolog.php
 
 RUN apt update --fix-missing && \
     export DEBIAN_FRONTEND=noninteractive && \
@@ -35,7 +36,7 @@ RUN apt update --fix-missing && \
     composer config --unset repositories.0 && \
     composer config repositories.fooman composer https://repo-magento-mirror.fooman.co.nz/ && \
     composer install && \
-    composer require monolog/monolog:2.6.0 && \
+    php scripts/downgrade-monolog.php && \
     if [ -f "/data/vendor/magento/module-inventory-catalog/etc/communication.xml" ]; then sed -i 's/is_synchronous="false"//g' /data/vendor/magento/module-inventory-catalog/etc/communication.xml; fi && \
     if [ -f "/data/vendor/magento/module-inventory-sales/etc/communication.xml" ]; then sed -i 's/is_synchronous="false"//g' /data/vendor/magento/module-inventory-sales/etc/communication.xml; fi && \
     if [ -f "/data/vendor/magento/module-inventory-indexer/etc/communication.xml" ]; then sed -i 's/is_synchronous="false"//g' /data/vendor/magento/module-inventory-indexer/etc/communication.xml; fi && \
@@ -59,7 +60,8 @@ RUN apt update --fix-missing && \
     composer config repositories.dev-extensions path extensions/* && \
     composer require --dev phpstan/phpstan:~1.7 bitexpert/phpstan-magento && \
     php scripts/apply-2.4-patches.php && \
-    rm scripts/apply-2.4-patches.php
+    rm scripts/apply-2.4-patches.php && \
+    rm scripts/downgrade-monolog.php
 
 COPY templates/install-config-mysql.php dev/tests/integration/etc/
 COPY templates/post-install-setup-command-config.php dev/tests/integration/etc/
