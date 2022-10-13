@@ -53,6 +53,22 @@ jobs:
           - { PHP_VERSION: php74-fpm, MAGENTO_VERSION: 2.4.4, SAMPLE_DATA: true }
           - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.4, SAMPLE_DATA: false }
           - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.4, SAMPLE_DATA: true }
+          - { PHP_VERSION: php74-fpm, MAGENTO_VERSION: 2.4.4-p1, SAMPLE_DATA: false }
+          - { PHP_VERSION: php74-fpm, MAGENTO_VERSION: 2.4.4-p1, SAMPLE_DATA: true }
+          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.4-p1, SAMPLE_DATA: false }
+          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.4-p1, SAMPLE_DATA: true }
+          - { PHP_VERSION: php74-fpm, MAGENTO_VERSION: 2.4.4-p2, SAMPLE_DATA: false }
+          - { PHP_VERSION: php74-fpm, MAGENTO_VERSION: 2.4.4-p2, SAMPLE_DATA: true }
+          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.4-p2, SAMPLE_DATA: false }
+          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.4-p2, SAMPLE_DATA: true }
+          - { PHP_VERSION: php74-fpm, MAGENTO_VERSION: 2.4.5, SAMPLE_DATA: false }
+          - { PHP_VERSION: php74-fpm, MAGENTO_VERSION: 2.4.5, SAMPLE_DATA: true }
+          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.5, SAMPLE_DATA: false }
+          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.5, SAMPLE_DATA: true }
+          - { PHP_VERSION: php74-fpm, MAGENTO_VERSION: 2.4.5-p1, SAMPLE_DATA: false }
+          - { PHP_VERSION: php74-fpm, MAGENTO_VERSION: 2.4.5-p1, SAMPLE_DATA: true }
+          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.5-p1, SAMPLE_DATA: false }
+          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.5-p1, SAMPLE_DATA: true }
     steps:
     - uses: actions/checkout@v1
 
