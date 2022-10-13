@@ -29,8 +29,7 @@ RUN apt update --fix-missing && \
     rm /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && \
     curl -o magento.zip https://repo-magento-mirror.fooman.co.nz/dist/magento/$MAGENTO_TYPE/magento-$MAGENTO_TYPE-$MAGENTO_VERSION.zip && \
     unzip -q magento.zip -d . && \
-    rm magento.zip && \
-    composer global require hirak/prestissimo
+    rm magento.zip
 
 COPY templates/magento-2.4.3-composer-with-replacements.json composer.json
 

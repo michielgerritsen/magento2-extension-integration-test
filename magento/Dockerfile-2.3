@@ -34,7 +34,6 @@ RUN apt update --fix-missing && \
     curl -o magento.zip https://repo-magento-mirror.fooman.co.nz/dist/magento/$MAGENTO_TYPE/magento-$MAGENTO_TYPE-$MAGENTO_VERSION.zip && \
     unzip -q magento.zip -d . && \
     rm magento.zip && \
-    composer global require hirak/prestissimo && \
     composer config --unset repositories.0 && \
     composer config repositories.fooman composer https://repo-magento-mirror.fooman.co.nz/ && \
     composer install && \
