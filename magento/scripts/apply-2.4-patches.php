@@ -6,6 +6,7 @@ $is241 = substr($version, 0, 5) == '2.4.1';
 $is242 = substr($version, 0, 5) == '2.4.2';
 $is243 = substr($version, 0, 5) == '2.4.3';
 $is244 = substr($version, 0, 5) == '2.4.4';
+$is245 = substr($version, 0, 5) == '2.4.5';
 $isP1 = substr($version, 6, 8) == 'p1';
 $isP2 = substr($version, 6, 8) == 'p2';
 
@@ -49,6 +50,10 @@ if ($is243) {
 
 if ($is244) {
     apply('33803/github-pr-33803-244.patch');
+}
+
+if ($is245) {
+    apply('33803/github-pr-33803-245.patch');
 }
 
 if ($is240 && !$isP1 && !$isP2) {
