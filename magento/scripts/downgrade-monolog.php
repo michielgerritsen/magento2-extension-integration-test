@@ -10,6 +10,17 @@ use Composer\Semver\VersionParser;
 
 require '/data/vendor/autoload.php';
 
+$version = getenv('MAGENTO_VERSION');
+$is244 = substr($version, 0, 5) == '2.4.4';
+$is245 = substr($version, 0, 5) == '2.4.5';
+$isP1 = substr($version, 6, 8) == 'p1';
+$isP2 = substr($version, 6, 8) == 'p2';
+
+if (($is244 && ($isP1 || $isP2)) || $is245) {
+    echo 'No monolog changes needed, skipping' . PHP_EOL;
+    return;
+}
+
 if (!class_exists(InstalledVersions::class)) {
     return;
 }
@@ -17,7 +28,7 @@ if (!class_exists(InstalledVersions::class)) {
 $installed = InstalledVersions::satisfies(new VersionParser(), 'monolog/monolog', '^2.7');
 
 if (!$installed) {
-    echo 'monolog/monolog seems not to be installed in version ^2.7.0 so I\'m not downgrading';
+    echo 'monolog/monolog seems not to be installed in version ^2.7.0 so I\'m not downgrading' . PHP_EOL;
     return;
 }
 

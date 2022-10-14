@@ -10,6 +10,7 @@ ENV FLAT_TABLES=false
 
 COPY patches/ patches/
 COPY scripts/apply-2.4-patches.php scripts/apply-2.4-patches.php
+COPY scripts/allow-composer-plugins.php scripts/allow-composer-plugins.php
 
 RUN apt update --fix-missing && \
     export DEBIAN_FRONTEND=noninteractive && \
@@ -29,12 +30,13 @@ RUN apt update --fix-missing && \
     rm /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && \
     curl -o magento.zip https://repo-magento-mirror.fooman.co.nz/dist/magento/$MAGENTO_TYPE/magento-$MAGENTO_TYPE-$MAGENTO_VERSION.zip && \
     unzip -q magento.zip -d . && \
-    rm magento.zip && \
-    composer global require hirak/prestissimo
+    rm magento.zip
 
 COPY templates/magento-2.4.3-composer-with-replacements.json composer.json
 
-RUN composer install && \
+RUN composer self-update && \
+    php scripts/allow-composer-plugins.php && rm scripts/allow-composer-plugins.php && \
+    composer install && \
     if [ -f "/data/vendor/magento/module-inventory-catalog/etc/communication.xml" ]; then sed -i 's/is_synchronous="false"//g' /data/vendor/magento/module-inventory-catalog/etc/communication.xml; fi && \
     if [ -f "/data/vendor/magento/module-inventory-sales/etc/communication.xml" ]; then sed -i 's/is_synchronous="false"//g' /data/vendor/magento/module-inventory-sales/etc/communication.xml; fi && \
     if [ -f "/data/vendor/magento/module-inventory-indexer/etc/communication.xml" ]; then sed -i 's/is_synchronous="false"//g' /data/vendor/magento/module-inventory-indexer/etc/communication.xml; fi && \
