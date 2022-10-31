@@ -22,6 +22,12 @@ if [ $status -ne 0 ]; then
   exit $status
 fi
 
+# Wait until Elasticsearch is up and running
+until curl -s -o /dev/null http://localhost:9200; do
+  echo "Elasticsearch not (yet) available, waiting..."
+  sleep 1
+done
+
 if [ -n "$URL" ]; then
   magerun2 config:store:set web/unsecure/base_url $URL
   magerun2 config:store:set web/secure/base_url $URL
