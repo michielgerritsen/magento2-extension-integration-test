@@ -2,7 +2,6 @@
 
 nohup su elasticsearch -s /usr/share/elasticsearch/bin/elasticsearch &
 status=$?
-sleep 10
 if [ $status -ne 0 ]; then
   echo "Failed to start elasticsearch: $status"
   exit $status
@@ -22,6 +21,8 @@ if [ $status -ne 0 ]; then
   echo "Failed to start the php server: $status"
   exit $status
 fi
+
+sleep 15
 
 if [ -n "$URL" ]; then
   magerun2 config:store:set web/unsecure/base_url $URL
