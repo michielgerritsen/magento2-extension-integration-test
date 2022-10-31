@@ -2,6 +2,7 @@
 
 nohup su elasticsearch -s /usr/share/elasticsearch/bin/elasticsearch &
 status=$?
+sleep 10
 if [ $status -ne 0 ]; then
   echo "Failed to start elasticsearch: $status"
   exit $status
