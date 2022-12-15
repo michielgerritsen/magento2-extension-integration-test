@@ -22,13 +22,8 @@ if [ $status -ne 0 ]; then
   exit $status
 fi
 
-# Wait until Elasticsearch is up and running
-until curl -s -o /dev/null http://localhost:9200; do
-  echo "Elasticsearch not (yet) available, waiting..."
-  sleep 1
-done
-
 if [ -n "$URL" ]; then
+  echo "Updating Base URL"
   magerun2 config:store:set web/unsecure/base_url $URL
   magerun2 config:store:set web/secure/base_url $URL
   magerun2 config:store:set web/unsecure/base_link_url $URL
@@ -36,7 +31,16 @@ if [ -n "$URL" ]; then
   magerun2 cache:flush
 fi
 
+# Wait until Elasticsearch is up and running
+counter=0
+until curl -s -o /dev/null http://localhost:9200; do
+  counter=$((counter + 1))
+  echo "Elasticsearch not (yet) available, waiting... (attempt $counter)"
+  sleep 1
+done
+
 if [ -n "$FLAT_TABLES" ]; then
+  echo "Enabling Flat Tables"
   magerun2 config:store:set catalog/frontend/flat_catalog_category 1
   magerun2 config:store:set catalog/frontend/flat_catalog_product 1
   magerun2 cache:flush
