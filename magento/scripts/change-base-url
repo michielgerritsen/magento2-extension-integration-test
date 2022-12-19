@@ -10,8 +10,10 @@ if [ "$#" -ne 1 ] || [ "$1" == "-h" ]; then
 fi
 
 URL=$1
-magerun2 config:store:set web/unsecure/base_url $URL
-magerun2 config:store:set web/secure/base_url $URL
-magerun2 config:store:set web/unsecure/base_link_url $URL
-magerun2 config:store:set web/secure/base_link_url $URL
+magerun2 config:store:set web/unsecure/base_url $URL &
+magerun2 config:store:set web/secure/base_url $URL &
+magerun2 config:store:set web/unsecure/base_link_url $URL &
+magerun2 config:store:set web/secure/base_link_url $URL &
 magerun2 cache:flush
+
+wait
