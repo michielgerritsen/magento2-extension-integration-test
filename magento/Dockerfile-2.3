@@ -82,6 +82,7 @@ COPY entrypoint.sh entrypoint.sh
 
 COPY scripts/enable-flat-catalog enable-flat-catalog
 COPY scripts/change-base-url change-base-url
+COPY scripts/retry retry
 
 RUN chmod +x enable-flat-catalog && chmod +x change-base-url
 
