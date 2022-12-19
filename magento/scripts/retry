@@ -1,21 +1,21 @@
 #!/bin/bash
 
-function fail {
-  echo $1 >&2
-  exit 1
-}
+# Set the maximum number of retries
+max_retries=5
 
-function retry {
-  local n=1
-  local max=5
-  while true; do
-    "$@" && break || {
-      if [[ $n -lt $max ]]; then
-        ((n++))
-        echo "Command failed. Attempt $n/$max:"
-      else
-        fail "The command has failed after $n attempts."
-      fi
-    }
-  done
-}
+# Set the initial number of retries to 0
+retries=0
+
+# Set the command to be executed as the first argument
+cmd=$1
+
+# Execute the command until it succeeds or the maximum number of retries is reached
+while ! eval $cmd && [ $retries -lt $max_retries ]; do
+  retries=$((retries+1))
+  sleep 1
+done
+
+# If the maximum number of retries was reached, exit with a non-zero exit code
+if [ $retries -eq $max_retries ]; then
+  exit 1
+fi
