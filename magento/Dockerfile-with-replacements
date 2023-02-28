@@ -39,7 +39,6 @@ COPY templates/magento-2.4.3-composer-with-replacements.json composer.json
 RUN composer self-update && \
     php scripts/allow-composer-plugins.php && rm scripts/allow-composer-plugins.php && \
     composer install && \
-    composer remove magento/composer-dependency-version-audit-plugin && \
     if [ -f "/data/vendor/magento/module-inventory-catalog/etc/communication.xml" ]; then sed -i 's/is_synchronous="false"//g' /data/vendor/magento/module-inventory-catalog/etc/communication.xml; fi && \
     if [ -f "/data/vendor/magento/module-inventory-sales/etc/communication.xml" ]; then sed -i 's/is_synchronous="false"//g' /data/vendor/magento/module-inventory-sales/etc/communication.xml; fi && \
     if [ -f "/data/vendor/magento/module-inventory-indexer/etc/communication.xml" ]; then sed -i 's/is_synchronous="false"//g' /data/vendor/magento/module-inventory-indexer/etc/communication.xml; fi && \
