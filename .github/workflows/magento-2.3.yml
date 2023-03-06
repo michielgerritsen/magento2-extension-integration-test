@@ -9,6 +9,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         cfg:
           - { PHP_VERSION: php74-fpm, MAGENTO_VERSION: 2.3.7-p3, SAMPLE_DATA: true }
