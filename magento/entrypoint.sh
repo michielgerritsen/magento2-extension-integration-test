@@ -22,7 +22,7 @@ if [ $status -ne 0 ]; then
   exit $status
 fi
 
-if [ -n "$URL" ]; then
+if [ -n "$URL" ] && [ "$URL" != "http://localhost/" ]; then
   echo "Updating Base URL"
   magerun2 config:store:set web/unsecure/base_url $URL
   magerun2 config:store:set web/secure/base_url $URL
