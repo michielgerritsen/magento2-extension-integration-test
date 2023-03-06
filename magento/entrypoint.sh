@@ -31,6 +31,11 @@ if [ -n "$URL" ] && [ "$URL" != "http://localhost/" ]; then
   magerun2 cache:flush
 fi
 
+# Allow to set the commands in an environment variable
+if [[ ! -z "${CUSTOM_ENTRYPOINT_COMMAND}" ]]; then
+  echo "${CUSTOM_ENTRYPOINT_COMMAND}" > custom-entrypoint.sh
+fi
+
 if [ -f custom-entrypoint.sh ]; then
   bash ./custom-entrypoint.sh
 fi
