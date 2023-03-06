@@ -31,6 +31,10 @@ if [ -n "$URL" ] && [ "$URL" != "http://localhost/" ]; then
   magerun2 cache:flush
 fi
 
+if [ -f custom-entrypoint.sh ]; then
+  bash ./custom-entrypoint.sh
+fi
+
 # Wait until Elasticsearch is up and running
 counter=0
 until curl -s -o /dev/null http://localhost:9200; do
