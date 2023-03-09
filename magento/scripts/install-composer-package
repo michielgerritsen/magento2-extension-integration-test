@@ -1,0 +1,9 @@
+#!/bin/bash
+
+if [ -z "$1" ]
+  then
+    echo "Please provide an argument."
+    exit 1
+fi
+
+composer require "$1" --no-plugins
