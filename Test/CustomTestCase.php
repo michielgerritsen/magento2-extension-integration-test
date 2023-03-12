@@ -16,7 +16,7 @@
  *
  */
 
-namespace MichielGerritsen\Magento2ExtensionIntegrationTest\Test\Integration;
+namespace MichielGerritsen\ExampleTest\Test\Integration;
 
 if (class_exists(\PHPUnit\Framework\TestCase::class)) {
     class CustomTestCase extends \PHPUnit\Framework\TestCase {}

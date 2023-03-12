@@ -16,7 +16,7 @@
  *
  */
 
-namespace MichielGerritsen\Magento2ExtensionIntegrationTest\Test\Integration;
+namespace MichielGerritsen\ExampleTest\Test\Integration;
 
 class ExampleTest extends CustomTestCase
 {

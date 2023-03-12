@@ -1,5 +1,5 @@
 ARG PHP_VERSION=php74-fpm
-FROM srcoder/development-php:${PHP_VERSION}
+FROM michielgerritsen/magento2-base-image:${PHP_VERSION}
 
 ARG MAGENTO_VERSION=2.4.4
 ARG MAGENTO_TYPE=project-community-edition
@@ -9,29 +9,16 @@ ENV CI=true
 ENV URL=http://localhost/
 ENV FLAT_TABLES=false
 
+COPY scripts/retry retry
 COPY patches/ patches/
 COPY scripts/apply-2.4-patches.php scripts/apply-2.4-patches.php
 COPY scripts/downgrade-monolog.php scripts/downgrade-monolog.php
 COPY scripts/allow-composer-plugins.php scripts/allow-composer-plugins.php
 
-RUN apt update --fix-missing && \
-    export DEBIAN_FRONTEND=noninteractive && \
-    apt install -y gnupg procps apt-transport-https lsb-release software-properties-common jq && \
-    curl -L https://artifacts.elastic.co/GPG-KEY-elasticsearch | apt-key add - && \
-    echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" | tee -a /etc/apt/sources.list.d/elastic-7.x.list && \
-    wget https://repo.mysql.com//mysql-apt-config_0.8.18-1_all.deb && \
-    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 467B942D3A79BD29 && \
-    dpkg -i mysql-apt-config_0.8.18-1_all.deb && \
-    apt update && \
-    echo "[mysqld]\ndefault-authentication-plugin=mysql_native_password" > ~/.my.cnf && \
-    apt install -y elasticsearch mysql-server mysql-client && \
-    /usr/share/elasticsearch/bin/elasticsearch-plugin install -b analysis-icu && \
-    /usr/share/elasticsearch/bin/elasticsearch-plugin install -b analysis-phonetic && \
-    rm -rf /var/lib/apt/lists/* && \
-    sed -i "s/.*bind-address.*/bind-address = 0.0.0.0/" /etc/mysql/mysql.conf.d/mysqld.cnf && \
-    echo 'memory_limit = 4G' >> /usr/local/etc/php/conf.d/memory-limit-php.ini && \
-    echo 'max_execution_time = 300' >> /usr/local/etc/php/conf.d/memory-limit-php.ini && \
-    rm /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && \
+# Comes from Github Actions
+COPY vendor /data/vendor
+
+RUN ./start-services && \
     if (( $(php -r 'echo version_compare(getenv("MAGENTO_VERSION"), "2.4.2", "<=") ? "true" : "false";') = "true" )); then composer self-update --1; else composer self-update --2; fi && \
     echo "Composer version:" && \
     composer --version && \
@@ -41,21 +28,12 @@ RUN apt update --fix-missing && \
     if (( $(php -r 'echo version_compare(getenv("MAGENTO_VERSION"), "2.4.2", "<=") ? "true" : "false";') = "true" )); then echo "Using Composer version 1 so skipping allow-plugins"; else php scripts/allow-composer-plugins.php rm scripts/allow-composer-plugins.php; fi && \
     composer config --unset repositories.0 && \
     composer config repositories.fooman composer https://repo-magento-mirror.fooman.co.nz/ && \
-    composer install && \
+    ./retry "composer install" && \
     php scripts/downgrade-monolog.php && \
     if [ -f "/data/vendor/magento/module-inventory-catalog/etc/communication.xml" ]; then sed -i 's/is_synchronous="false"//g' /data/vendor/magento/module-inventory-catalog/etc/communication.xml; fi && \
     if [ -f "/data/vendor/magento/module-inventory-sales/etc/communication.xml" ]; then sed -i 's/is_synchronous="false"//g' /data/vendor/magento/module-inventory-sales/etc/communication.xml; fi && \
     if [ -f "/data/vendor/magento/module-inventory-indexer/etc/communication.xml" ]; then sed -i 's/is_synchronous="false"//g' /data/vendor/magento/module-inventory-indexer/etc/communication.xml; fi && \
     composer dump-autoload && \
-    service elasticsearch start && \
-    /bin/bash -c "/usr/bin/mysqld_safe &" && \
-    sleep 5 && \
-    mysql -u root -e 'CREATE DATABASE `magento`;' && \
-    mysql -u root -e 'CREATE DATABASE `magento-test`;' && \
-    mysql -u root -e "CREATE USER 'magento'@'%' IDENTIFIED BY 'password';" && \
-    mysql -u root -e "CREATE USER 'magento-test'@'%' IDENTIFIED BY 'password';" && \
-    mysql -u root -e "GRANT ALL PRIVILEGES ON * . * TO 'magento'@'%';" && \
-    mysql -u root -e "GRANT ALL PRIVILEGES ON * . * TO 'magento-test'@'%';" && \
     php bin/magento setup:install --backend-frontname=admin --session-save=db --db-host=127.0.0.1 --db-name=magento --db-user=magento --db-password=password --base-url=http://localhost --timezone=Europe/Amsterdam --currency=EUR --admin-user=exampleuser --admin-password=examplepassword123 --admin-email=user@example.com --admin-firstname=Example --admin-lastname=Example --use-rewrites=1 --use-sample-data && \
     php bin/magento deploy:mode:set developer && \
     if [ "${SAMPLE_DATA}" = "true" ]; then php bin/magento sampledata:deploy; fi && \
@@ -78,7 +56,6 @@ COPY entrypoint.sh entrypoint.sh
 
 COPY scripts/enable-flat-catalog enable-flat-catalog
 COPY scripts/change-base-url change-base-url
-COPY scripts/retry retry
 COPY scripts/install-composer-package install-composer-package
 
 RUN chmod +x enable-flat-catalog && chmod +x change-base-url

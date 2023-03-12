@@ -79,6 +79,15 @@ jobs:
     steps:
     - uses: actions/checkout@v1
 
+    - name: Cache Composer packages
+      uses: actions/cache@v3
+      with:
+        path: magento/vendor
+        key: ${{ matrix.cfg.PHP_VERSION }}-magento${{ matrix.cfg.MAGENTO_VERSION }}
+
+    - name: Create vendor folder
+      run: mkdir magento/vendor || echo "Vendor folder already exists"
+
     # Step 1: Build the docker image
     - name: Build the Docker image (without sample data)
       if: matrix.cfg.SAMPLE_DATA == false
@@ -113,17 +122,24 @@ jobs:
     - name: Create the dummy test directory
       run: docker exec magento-project-community-edition mkdir -p /data/app/code/MichielGerritsen/Magento2ExtensionIntegrationTest/Test/Integration
 
-    - name: Copy the example test
-      run: for file in Test/*; do docker cp $file magento-project-community-edition:/data/app/code/MichielGerritsen/Magento2ExtensionIntegrationTest/Test/Integration/; done
+    - name: Copy the example test module
+      run: |
+        docker exec magento-project-community-edition mkdir -p /data/extensions/MichielGerritsen-ExampleTest/Test/Integration/
+        docker cp Test/composer.json magento-project-community-edition:/data/extensions/MichielGerritsen-ExampleTest/
+        docker cp Test/ExampleTest.php magento-project-community-edition:/data/extensions/MichielGerritsen-ExampleTest/Test/Integration/
+        docker cp Test/CustomTestCase.php magento-project-community-edition:/data/extensions/MichielGerritsen-ExampleTest/Test/Integration/
+
+    - name: Install the example test module
+      run: docker exec magento-project-community-edition composer require michielgerritsen/exampletest:@dev
 
     - name: Enable developer mode
-      run: docker exec magento-project-community-edition bash -c "until php bin/magento deploy:mode:set developer || (( count++ >= 10 )); do echo 'Command failed. New try'; done"
+      run: docker exec magento-project-community-edition ./retry "bin/magento deploy:mode:set developer"
 
     - name: Run setup:di:compile
-      run: docker exec magento-project-community-edition php bin/magento setup:di:compile || docker exec magento-project-community-edition php bin/magento setup:di:compile || docker exec magento-project-community-edition php bin/magento setup:di:compile || docker exec magento-project-community-edition php bin/magento setup:di:compile
+      run: docker exec magento-project-community-edition ./retry "php bin/magento setup:di:compile"
 
     - name: Run the example test
-      run: docker exec magento-project-community-edition bash -c "cd /data/dev/tests/integration/ && ../../../vendor/bin/phpunit /data/app/code/MichielGerritsen/Magento2ExtensionIntegrationTest/Test/Integration/ExampleTest.php"
+      run: docker exec magento-project-community-edition bash -c "cd /data/dev/tests/integration/ && ../../../vendor/bin/phpunit /data/vendor/michielgerritsen/exampletest/Test/Integration/ExampleTest.php"
 
     # Step 3: Upload the images to Docker Hub.
     - name: Docker hub login
@@ -137,3 +153,21 @@ jobs:
     - name: Push the image to Docker hub (with sample data)
       if: github.ref == 'refs/heads/master' && matrix.cfg.SAMPLE_DATA == true
       run: docker push michielgerritsen/magento-project-community-edition:${{ matrix.cfg.PHP_VERSION }}-magento${{ matrix.cfg.MAGENTO_VERSION }}-sample-data
+
+    - name: Copy the vendor folder for caching
+      run: docker cp magento-project-community-edition:/data/vendor magento/vendor
+
+    - name: Dump Docker logs files (on failure)
+      if: failure()
+      run: |
+        mkdir failure-logs
+        docker logs magento-project-community-edition > failure-logs/docker.log
+        docker cp magento-project-community-edition:/data/var/log failure-logs/var/log
+
+    - name: Upload failure artifacts
+      if: failure()
+      uses: actions/upload-artifact@v3
+      with:
+        name: failure-artifacts-${{ matrix.cfg.PHP_VERSION }}-magento${{ matrix.cfg.MAGENTO_VERSION }}
+        path: |
+          failure-logs
