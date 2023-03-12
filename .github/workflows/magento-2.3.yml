@@ -117,10 +117,10 @@ jobs:
       run: for file in Test/*; do docker cp $file magento-project-community-edition:/data/app/code/MichielGerritsen/Magento2ExtensionIntegrationTest/Test/Integration/; done
 
     - name: Enable developer mode
-      run: docker exec magento-project-community-edition bash -c "until php bin/magento deploy:mode:set developer || (( count++ >= 10 )); do echo 'Command failed. New try'; done"
+      run: docker exec magento-project-community-edition ./retry "bin/magento deploy:mode:set developer"
 
     - name: Run setup:di:compile
-      run: docker exec magento-project-community-edition php bin/magento setup:di:compile || docker exec magento-project-community-edition php bin/magento setup:di:compile || docker exec magento-project-community-edition php bin/magento setup:di:compile || docker exec magento-project-community-edition php bin/magento setup:di:compile
+      run: docker exec magento-project-community-edition ./retry "php bin/magento setup:di:compile"
 
     - name: Run the example test
       run: docker exec magento-project-community-edition bash -c "cd /data/dev/tests/integration/ && ../../../vendor/bin/phpunit /data/app/code/MichielGerritsen/Magento2ExtensionIntegrationTest/Test/Integration/ExampleTest.php"
