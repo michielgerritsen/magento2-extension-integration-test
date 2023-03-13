@@ -72,11 +72,11 @@ jobs:
     - name: Cache Composer packages
       uses: actions/cache@v3
       with:
-        path: vendor
+        path: magento/vendor
         key: ${{ matrix.cfg.PHP_VERSION }}-magento${{ matrix.cfg.MAGENTO_VERSION }}
 
     - name: Create vendor folder
-      run: mkdir vendor && mv vendor magento
+      run: mkdir magento/vendor
 
     # Step 1: Build the docker image
     - name: Build the Docker image (without sample data)
@@ -145,4 +145,4 @@ jobs:
       run: docker push michielgerritsen/magento-project-community-edition:${{ matrix.cfg.PHP_VERSION }}-magento${{ matrix.cfg.MAGENTO_VERSION }}-sample-data
 
     - name: Copy the vendor folder for caching
-      run: docker cp magento-project-community-edition:/data/vendor vendor
+      run: docker cp magento-project-community-edition:/data/vendor magento/vendor
