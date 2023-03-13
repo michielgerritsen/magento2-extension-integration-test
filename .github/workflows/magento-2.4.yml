@@ -117,10 +117,10 @@ jobs:
 
     - name: Copy the example test
       run: |
-        docker exec magento-project-community-edition mkdir -p /data/extensions/MichielGerritsen/exampletest/
-        docker cp Test/composer.json magento-project-community-edition:/data/extensions/MichielGerritsen/exampletest/
-        docker cp Test/ExampleTest.php magento-project-community-edition:/data/extensions/MichielGerritsen/exampletest/Test/Integration/
-        docker cp Test/CustomTestCase.php magento-project-community-edition:/data/extensions/MichielGerritsen/exampletest/Test/Integration/
+        docker exec magento-project-community-edition mkdir -p /data/extensions/MichielGerritsen/ExampleTest/Test/Integration/
+        docker cp Test/composer.json magento-project-community-edition:/data/extensions/MichielGerritsen/ExampleTest/
+        docker cp Test/ExampleTest.php magento-project-community-edition:/data/extensions/MichielGerritsen/ExampleTest/Test/Integration/
+        docker cp Test/CustomTestCase.php magento-project-community-edition:/data/extensions/MichielGerritsen/ExampleTest/Test/Integration/
         docker exec magento-project-community-edition composer require michielgerritsen/exampletest:@dev
 
     - name: Enable developer mode
