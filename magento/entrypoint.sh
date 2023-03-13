@@ -1,19 +1,7 @@
 #!/bin/bash
 
-nohup su elasticsearch -s /usr/share/elasticsearch/bin/elasticsearch &
-status=$?
-if [ $status -ne 0 ]; then
-  echo "Failed to start elasticsearch: $status"
-  exit $status
-fi
-
-# Start the second process
-nohup mysqld_safe &
-status=$?
-if [ $status -ne 0 ]; then
-  echo "Failed to start mysqld_safe: $status"
-  exit $status
-fi
+# Comes from the parent image
+./start-services
 
 nohup /usr/local/bin/php -S 0.0.0.0:80 -t /data/pub/ /data/phpserver/router.php &
 status=$?
