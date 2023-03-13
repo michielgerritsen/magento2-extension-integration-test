@@ -16,7 +16,7 @@ jobs:
     - uses: actions/checkout@v1
 
     - name: Cache Composer packages
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: vendor
         key: ${{ matrix.cfg.PHP_VERSION }}-magento${{ matrix.cfg.MAGENTO_VERSION }}
@@ -42,7 +42,11 @@ jobs:
       run: docker exec magento-project-community-edition mkdir -p /data/app/code/MichielGerritsen/Magento2ExtensionIntegrationTest/Test/Integration
 
     - name: Copy the example test
-      run: for file in Test/*; do docker cp $file magento-project-community-edition:/data/app/code/MichielGerritsen/Magento2ExtensionIntegrationTest/Test/Integration/; done
+      run: |
+        docker cp Test/composer.json magento-project-community-edition:/data/extensions/MichielGerritsen/exampletest/
+        docker cp Test/ExampleTest.php magento-project-community-edition:/data/extensions/MichielGerritsen/exampletest/Test/Integration/
+        docker cp Test/CustomTestCase.php magento-project-community-edition:/data/extensions/MichielGerritsen/exampletest/Test/Integration/
+        docker exec magento-project-community-edition composer require michielgerritsen/exampletest:@dev
 
     - name: Enable developer mode
       run: docker exec magento-project-community-edition ./retry "bin/magento deploy:mode:set developer"
