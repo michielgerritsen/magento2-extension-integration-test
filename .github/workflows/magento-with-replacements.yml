@@ -22,7 +22,7 @@ jobs:
         key: ${{ matrix.cfg.PHP_VERSION }}-magento${{ matrix.cfg.MAGENTO_VERSION }}
 
     - name: Create vendor folder
-      run: mkdir vendor
+      run: mkdir vendor && mv vendor magento
 
     # Step 1: Build the docker image
     - name: Build the Docker image
