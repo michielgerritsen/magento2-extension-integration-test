@@ -85,6 +85,9 @@ jobs:
         path: vendor
         key: ${{ matrix.cfg.PHP_VERSION }}-magento${{ matrix.cfg.MAGENTO_VERSION }}
 
+    - name: Create vendor folder
+      run: mkdir vendor
+
     # Step 1: Build the docker image
     - name: Build the Docker image (without sample data)
       if: matrix.cfg.SAMPLE_DATA == false
