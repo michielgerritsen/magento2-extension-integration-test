@@ -43,15 +43,10 @@ jobs:
 
     - name: Copy the example test module
       run: |
-        ls -al Test
-        echo "mkdir"
         docker exec magento-project-community-edition mkdir -p /data/extensions/MichielGerritsen-ExampleTest/Test/Integration/
-        echo "Copying Test/composer.json"
         docker cp Test/composer.json magento-project-community-edition:/data/extensions/MichielGerritsen-ExampleTest/
-        echo "Copying Test/ExampleTest.php"
         docker cp Test/ExampleTest.php magento-project-community-edition:/data/extensions/MichielGerritsen-ExampleTest/Test/Integration/
-        echo "Copying Test/CustomTestCase.php"
-        docker cp Test/CustomTestCase.php magento-project-community-edition:/data/extensions/MichielGerritsen/ExampleTest/Test/Integration/
+        docker cp Test/CustomTestCase.php magento-project-community-edition:/data/extensions/MichielGerritsen-ExampleTest/Test/Integration/
 
     - name: Install the example test module
       run: docker exec magento-project-community-edition composer require michielgerritsen/exampletest:@dev
