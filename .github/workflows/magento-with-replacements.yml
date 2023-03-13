@@ -19,10 +19,10 @@ jobs:
       uses: actions/cache@v3
       with:
         path: magento/vendor
-        key: ${{ matrix.cfg.PHP_VERSION }}-magento${{ matrix.cfg.MAGENTO_VERSION }}
+        key: ${{ matrix.cfg.PHP_VERSION }}-magento${{ matrix.cfg.MAGENTO_VERSION }}-with-replacements
 
     - name: Create vendor folder
-      run: mkdir -f magento/vendor
+      run: mkdir magento/vendor || echo "Vendor folder already exists"
 
     # Step 1: Build the docker image
     - name: Build the Docker image
