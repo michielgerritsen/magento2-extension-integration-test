@@ -15,6 +15,12 @@ jobs:
     steps:
     - uses: actions/checkout@v1
 
+    - name: Cache Composer packages
+      uses: actions/cache@v2
+      with:
+        path: vendor
+        key: ${{ matrix.cfg.PHP_VERSION }}-magento${{ matrix.cfg.MAGENTO_VERSION }}
+
     # Step 1: Build the docker image
     - name: Build the Docker image
       run:
@@ -28,6 +34,9 @@ jobs:
       run:
         docker run --memory=4G --detach --name magento-project-community-edition
         michielgerritsen/magento-project-community-edition:${{ matrix.cfg.PHP_VERSION }}-magento${{ matrix.cfg.MAGENTO_VERSION }}-with-replacements
+
+    - name: Copy the vendor folder for caching
+      run: docker cp magento-project-community-edition:/data/vendor vendor
 
     - name: Create the dummy test directory
       run: docker exec magento-project-community-edition mkdir -p /data/app/code/MichielGerritsen/Magento2ExtensionIntegrationTest/Test/Integration
