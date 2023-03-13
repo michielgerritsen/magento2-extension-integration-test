@@ -20,7 +20,7 @@ RUN curl -o magento.zip https://repo-magento-mirror.fooman.co.nz/dist/magento/$M
     unzip -q magento.zip -d . && \
     rm magento.zip
 
-COPY templates/magento-2.4.3-composer-with-replacements.json composer.json
+COPY templates/magento-${MAGENTO_VERSION}-composer-with-replacements.json composer.json
 
 RUN ./start-services && \
     php scripts/allow-composer-plugins.php && rm scripts/allow-composer-plugins.php && \

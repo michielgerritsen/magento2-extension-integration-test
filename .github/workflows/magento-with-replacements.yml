@@ -12,6 +12,7 @@ jobs:
       matrix:
         cfg:
           - { PHP_VERSION: php74-fpm, MAGENTO_VERSION: 2.4.3 }
+          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.5 }
     steps:
     - uses: actions/checkout@v1
 
