@@ -119,9 +119,6 @@ jobs:
         docker run --detach --name magento-project-community-edition
         michielgerritsen/magento-project-community-edition:${{ matrix.cfg.PHP_VERSION }}-magento${{ matrix.cfg.MAGENTO_VERSION }}-sample-data
 
-    - name: Copy the vendor folder for caching
-      run: docker cp magento-project-community-edition:/data/vendor vendor
-
     - name: Create the dummy test directory
       run: docker exec magento-project-community-edition mkdir -p /data/app/code/MichielGerritsen/Magento2ExtensionIntegrationTest/Test/Integration
 
@@ -156,3 +153,6 @@ jobs:
     - name: Push the image to Docker hub (with sample data)
       if: github.ref == 'refs/heads/master' && matrix.cfg.SAMPLE_DATA == true
       run: docker push michielgerritsen/magento-project-community-edition:${{ matrix.cfg.PHP_VERSION }}-magento${{ matrix.cfg.MAGENTO_VERSION }}-sample-data
+
+    - name: Copy the vendor folder for caching
+      run: docker cp magento-project-community-edition:/data/vendor vendor
