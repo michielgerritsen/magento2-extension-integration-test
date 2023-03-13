@@ -146,3 +146,17 @@ jobs:
 
     - name: Copy the vendor folder for caching
       run: docker cp magento-project-community-edition:/data/vendor magento/vendor
+
+    - name: Copy Docker logs files
+      if: failure()
+      run: |
+        docker logs magento-project-community-edition > failure-logs/docker.log
+        docker cp magento-project-community-edition:/data/var/log failure-logs/var/log
+
+    - name: Failure artifacts
+      if: failure()
+      uses: actions/upload-artifact@v3
+      with:
+        name: failure-artifacts-${{ matrix.cfg.PHP_VERSION }}-magento${{ matrix.cfg.MAGENTO_VERSION }}
+        path: |
+          failure-logs
