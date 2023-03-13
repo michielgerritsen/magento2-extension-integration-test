@@ -44,13 +44,15 @@ jobs:
     - name: Create the dummy test directory
       run: docker exec magento-project-community-edition mkdir -p /data/app/code/MichielGerritsen/Magento2ExtensionIntegrationTest/Test/Integration
 
-    - name: Copy the example test
+    - name: Copy the example test module
       run: |
         docker exec magento-project-community-edition mkdir -p /data/extensions/MichielGerritsen-ExampleTest/Test/Integration/
         docker cp Test/composer.json magento-project-community-edition:/data/extensions/MichielGerritsen-ExampleTest/
         docker cp Test/ExampleTest.php magento-project-community-edition:/data/extensions/MichielGerritsen-ExampleTest/Test/Integration/
         docker cp Test/CustomTestCase.php magento-project-community-edition:/data/extensions/MichielGerritsen/ExampleTest/Test/Integration/
-        docker exec magento-project-community-edition composer require michielgerritsen/exampletest:@dev
+
+    - name: Install the example test module
+      run: docker exec magento-project-community-edition composer require michielgerritsen/exampletest:@dev
 
     - name: Enable developer mode
       run: docker exec magento-project-community-edition ./retry "bin/magento deploy:mode:set developer"
