@@ -16,8 +16,9 @@ $is245 = substr($version, 0, 5) == '2.4.5';
 $is246 = substr($version, 0, 5) == '2.4.6';
 $isP1 = substr($version, 6, 8) == 'p1';
 $isP2 = substr($version, 6, 8) == 'p2';
+$isP3 = substr($version, 6, 8) == 'p3';
 
-if (($is244 && ($isP1 || $isP2)) || $is245 || $is246) {
+if (($is244 && ($isP1 || $isP2 || $isP3)) || $is245 || $is246) {
     echo 'No monolog changes needed, skipping' . PHP_EOL;
     return;
 }
