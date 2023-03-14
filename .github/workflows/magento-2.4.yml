@@ -12,10 +12,20 @@ jobs:
       fail-fast: false
       matrix:
         cfg:
-          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.5, SAMPLE_DATA: false }
-          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.5, SAMPLE_DATA: true }
+          - { PHP_VERSION: php82-fpm, MAGENTO_VERSION: 2.4.6, SAMPLE_DATA: false }
+          - { PHP_VERSION: php82-fpm, MAGENTO_VERSION: 2.4.6, SAMPLE_DATA: true }
+          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.6, SAMPLE_DATA: false }
+          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.6, SAMPLE_DATA: true }
+          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.5-p2, SAMPLE_DATA: false }
+          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.5-p2, SAMPLE_DATA: true }
           - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.5-p1, SAMPLE_DATA: false }
           - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.5-p1, SAMPLE_DATA: true }
+          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.5, SAMPLE_DATA: false }
+          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.5, SAMPLE_DATA: true }
+          - { PHP_VERSION: php74-fpm, MAGENTO_VERSION: 2.4.4-p3, SAMPLE_DATA: false }
+          - { PHP_VERSION: php74-fpm, MAGENTO_VERSION: 2.4.4-p3, SAMPLE_DATA: true }
+          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.4-p3, SAMPLE_DATA: false }
+          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.4-p3, SAMPLE_DATA: true }
           - { PHP_VERSION: php74-fpm, MAGENTO_VERSION: 2.4.4-p2, SAMPLE_DATA: false }
           - { PHP_VERSION: php74-fpm, MAGENTO_VERSION: 2.4.4-p2, SAMPLE_DATA: true }
           - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.4-p2, SAMPLE_DATA: false }
