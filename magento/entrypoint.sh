@@ -44,11 +44,6 @@ if [ -n "$FLAT_TABLES" ]; then
   magerun2 indexer:reindex
 fi
 
-#if grep -q Magento_TwoFactorAuth "$File"; then
-#  echo "Disabling Magento_TwoFactorAuth"
-#  php bin/magento module:disable Magento_TwoFactorAuth
-#fi
-
 while sleep 5; do
   ps aux |grep elasticsearch |grep -q -v grep
   ELASTICSEARCH_STATUS=$?
