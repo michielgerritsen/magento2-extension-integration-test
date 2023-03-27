@@ -40,8 +40,8 @@ if [ -n "$FLAT_TABLES" ]; then
   echo "Enabling Flat Tables"
   magerun2 config:store:set catalog/frontend/flat_catalog_category 1
   magerun2 config:store:set catalog/frontend/flat_catalog_product 1
-  magerun2 cache:flush
-  magerun2 indexer:reindex
+  php bin/magento cache:flush
+  php bin/magento indexer:reindex
 fi
 
 while sleep 5; do

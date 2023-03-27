@@ -32,7 +32,7 @@ RUN ./start-services && \
     php bin/magento deploy:mode:set developer && \
     php bin/magento setup:static-content:deploy en_US -f -j 12 && \
     php bin/magento setup:di:compile && \
-    magerun2 indexer:reindex && \
+    php bin/magento indexer:reindex && \
     mkdir -p extensions && \
     composer config repositories.dev-extensions path extensions/* && \
     composer require --dev phpstan/phpstan:~1.7 bitexpert/phpstan-magento && \
