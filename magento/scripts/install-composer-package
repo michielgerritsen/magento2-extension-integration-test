@@ -1,9 +1,14 @@
 #!/bin/bash
 
-if [ -z "$1" ]
-  then
-    echo "Please provide an argument."
-    exit 1
+if [ "$#" -eq 0 ]; then
+  echo "Please provide at least one argument."
+  exit 1
 fi
 
-composer require "$1" --no-plugins
+packages=""
+for package in "$@"
+do
+  packages="$packages $package"
+done
+
+composer require $packages --no-plugins --no-interaction
