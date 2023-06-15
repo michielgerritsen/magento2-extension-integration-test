@@ -12,16 +12,48 @@ jobs:
       fail-fast: false
       matrix:
         cfg:
+          - { PHP_VERSION: php82-fpm, MAGENTO_VERSION: 2.4.7-beta2, SAMPLE_DATA: false }
+          - { PHP_VERSION: php82-fpm, MAGENTO_VERSION: 2.4.7-beta2, SAMPLE_DATA: true }
+          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.7-beta2, SAMPLE_DATA: false }
+          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.7-beta2, SAMPLE_DATA: true }
+          - { PHP_VERSION: php82-fpm, MAGENTO_VERSION: 2.4.6-p3, SAMPLE_DATA: false }
+          - { PHP_VERSION: php82-fpm, MAGENTO_VERSION: 2.4.6-p3, SAMPLE_DATA: true }
+          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.6-p3, SAMPLE_DATA: false }
+          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.6-p3, SAMPLE_DATA: true }
+          # 2.4.6-p2 is disabled due to this error that keeps haunting me:
+          # Connection "default" is not defined
+#          - { PHP_VERSION: php82-fpm, MAGENTO_VERSION: 2.4.6-p2, SAMPLE_DATA: false }
+#          - { PHP_VERSION: php82-fpm, MAGENTO_VERSION: 2.4.6-p2, SAMPLE_DATA: true }
+#          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.6-p2, SAMPLE_DATA: false }
+#          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.6-p2, SAMPLE_DATA: true }
+          - { PHP_VERSION: php82-fpm, MAGENTO_VERSION: 2.4.6-p1, SAMPLE_DATA: false }
+          - { PHP_VERSION: php82-fpm, MAGENTO_VERSION: 2.4.6-p1, SAMPLE_DATA: true }
+          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.6-p1, SAMPLE_DATA: false }
+          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.6-p1, SAMPLE_DATA: true }
           - { PHP_VERSION: php82-fpm, MAGENTO_VERSION: 2.4.6, SAMPLE_DATA: false }
           - { PHP_VERSION: php82-fpm, MAGENTO_VERSION: 2.4.6, SAMPLE_DATA: true }
           - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.6, SAMPLE_DATA: false }
           - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.6, SAMPLE_DATA: true }
+          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.5-p5, SAMPLE_DATA: false }
+          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.5-p5, SAMPLE_DATA: true }
+          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.5-p4, SAMPLE_DATA: false }
+          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.5-p4, SAMPLE_DATA: true }
+          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.5-p3, SAMPLE_DATA: false }
+          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.5-p3, SAMPLE_DATA: true }
           - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.5-p2, SAMPLE_DATA: false }
           - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.5-p2, SAMPLE_DATA: true }
           - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.5-p1, SAMPLE_DATA: false }
           - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.5-p1, SAMPLE_DATA: true }
           - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.5, SAMPLE_DATA: false }
           - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.5, SAMPLE_DATA: true }
+          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.4-p6, SAMPLE_DATA: false }
+          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.4-p6, SAMPLE_DATA: true }
+          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.4-p5, SAMPLE_DATA: false }
+          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.4-p5, SAMPLE_DATA: true }
+          - { PHP_VERSION: php74-fpm, MAGENTO_VERSION: 2.4.4-p4, SAMPLE_DATA: false }
+          - { PHP_VERSION: php74-fpm, MAGENTO_VERSION: 2.4.4-p4, SAMPLE_DATA: true }
+          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.4-p4, SAMPLE_DATA: false }
+          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.4-p4, SAMPLE_DATA: true }
           - { PHP_VERSION: php74-fpm, MAGENTO_VERSION: 2.4.4-p3, SAMPLE_DATA: false }
           - { PHP_VERSION: php74-fpm, MAGENTO_VERSION: 2.4.4-p3, SAMPLE_DATA: true }
           - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.4-p3, SAMPLE_DATA: false }
@@ -127,7 +159,6 @@ jobs:
         docker exec magento-project-community-edition mkdir -p /data/extensions/MichielGerritsen-ExampleTest/Test/Integration/
         docker cp Test/composer.json magento-project-community-edition:/data/extensions/MichielGerritsen-ExampleTest/
         docker cp Test/ExampleTest.php magento-project-community-edition:/data/extensions/MichielGerritsen-ExampleTest/Test/Integration/
-        docker cp Test/CustomTestCase.php magento-project-community-edition:/data/extensions/MichielGerritsen-ExampleTest/Test/Integration/
 
     - name: Install the example test module
       run: docker exec magento-project-community-edition composer require michielgerritsen/exampletest:@dev
