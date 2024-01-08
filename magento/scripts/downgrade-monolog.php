@@ -14,11 +14,15 @@ $version = getenv('MAGENTO_VERSION');
 $is244 = substr($version, 0, 5) == '2.4.4';
 $is245 = substr($version, 0, 5) == '2.4.5';
 $is246 = substr($version, 0, 5) == '2.4.6';
+$is247 = substr($version, 0, 5) == '2.4.7';
 $isP1 = substr($version, 6, 8) == 'p1';
 $isP2 = substr($version, 6, 8) == 'p2';
 $isP3 = substr($version, 6, 8) == 'p3';
+$isP4 = substr($version, 6, 8) == 'p4';
+$isP5 = substr($version, 6, 8) == 'p5';
+$isP6 = substr($version, 6, 8) == 'p6';
 
-if (($is244 && ($isP1 || $isP2 || $isP3)) || $is245 || $is246) {
+if (($is244 && ($isP1 || $isP2 || $isP3 || $isP4 || $isP5 || $isP6)) || $is245 || $is246 || $is247) {
     echo 'No monolog changes needed, skipping' . PHP_EOL;
     return;
 }

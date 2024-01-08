@@ -18,7 +18,7 @@
 
 namespace MichielGerritsen\ExampleTest\Test\Integration;
 
-class ExampleTest extends CustomTestCase
+class ExampleTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * The only goal of this test is to check if test can be run successful.

@@ -8,6 +8,7 @@ ARG SAMPLE_DATA=false
 ENV CI=true
 ENV URL=http://localhost/
 ENV FLAT_TABLES=false
+ENV COMPOSER_ALLOW_SUPERUSER=1
 
 COPY scripts/retry retry
 COPY patches/ patches/
