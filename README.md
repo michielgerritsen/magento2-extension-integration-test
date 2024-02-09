@@ -76,3 +76,36 @@ In the examples folder you can find 2 examples for integration and unit tests. V
 
 Special thanks to Fooman for providing a Magento 2 mirror that does not requires any authentication:
 - https://store.fooman.co.nz/blog/no-authentication-needed-magento-2-mirror.html
+
+## Version matrix
+
+| Magento version | PHP 8.2 | PHP 8.1 | PHP 7.4 | PHP 7.3 |
+|--------------|---------|---------|---------|---------|
+| 2.4.7-beta2  | x       | x       | -       | -       |
+| 2.4.6-p3     | x       | x       | -       | -       |
+| 2.4.6-p2     | -       | -       | -       | -       |
+| 2.4.6-p1     | x       | x       | -       | -       |
+| 2.4.6        | x       | x       | -       | -       |
+| 2.4.5-p5     | -       | x       | -       | -       |
+| 2.4.5-p4     | -       | x       | -       | -       |
+| 2.4.5-p3     | -       | x       | -       | -       |
+| 2.4.5-p2     | -       | x       | -       | -       |
+| 2.4.5-p1     | -       | x       | -       | -       |
+| 2.4.5        | -       | x       | -       | -       |
+| 2.4.4-p6     | -       | x       | -       | -       |
+| 2.4.4-p5     | -       | x       | -       | -       |
+| 2.4.4-p4     | -       | x       | x       | -       |
+| 2.4.4-p3     | -       | x       | x       | -       |
+| 2.4.4-p2     | -       | x       | x       | -       |
+| 2.4.4-p1     | -       | x       | x       | -       |
+| 2.4.4        | -       | x       | x       | -       |
+| 2.4.3-p2     | -       | -       | x       | -       |
+| 2.4.3-p1     | -       | -       | x       | x       |
+| 2.4.3        | -       | -       | x       | x       |
+| 2.4.2-p2     | -       | -       | x       | x       |
+| 2.4.2-p1     | -       | -       | x       | x       |
+| 2.4.2        | -       | -       | x       | x       |
+| 2.4.1-p1     | -       | -       | x       | x       |
+| 2.4.1        | -       | -       | x       | x       |
+| 2.4.0-p1     | -       | -       | x       | x       |
+| 2.4.0        | -       | -       | x       | x       |
