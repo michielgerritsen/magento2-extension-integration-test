@@ -48,7 +48,8 @@ RUN ./start-services && \
     mkdir -p extensions && \
     composer config repositories.dev-extensions path extensions/* && \
     php scripts/install-phpstan.php && \
-    rm scripts/install-phpstan.php
+    rm scripts/install-phpstan.php && \
+    ./stop-services
 
 COPY patches/cors.patch cors.patch
 COPY templates/install-config-mysql.php dev/tests/integration/etc/

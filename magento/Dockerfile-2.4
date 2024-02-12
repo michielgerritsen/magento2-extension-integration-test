@@ -47,7 +47,8 @@ RUN ./start-services && \
     composer require --dev phpstan/phpstan:~1.7 bitexpert/phpstan-magento && \
     php scripts/apply-2.4-patches.php && \
     rm scripts/apply-2.4-patches.php && \
-    rm scripts/downgrade-monolog.php
+    rm scripts/downgrade-monolog.php && \
+    ./stop-services
 
 COPY templates/install-config-mysql.php dev/tests/integration/etc/
 COPY templates/post-install-setup-command-config.php dev/tests/integration/etc/
