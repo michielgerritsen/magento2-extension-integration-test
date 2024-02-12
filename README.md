@@ -109,6 +109,7 @@ Special thanks to Fooman for providing a Magento 2 mirror that does not requires
 | 2.4.1           | -       | -       | x       | x       | -       |
 | 2.4.0-p1        | -       | -       | x       | x       | -       |
 | 2.4.0           | -       | -       | x       | x       | -       |
+| 2.3.7-p4        | -       | -       | x       | x       | -       |
 | 2.3.7-p3        | -       | -       | x       | x       | -       |
 | 2.3.7-p2        | -       | -       | x       | x       | -       |
 | 2.3.7-p1        | -       | -       | x       | x       | -       |
