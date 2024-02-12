@@ -12,6 +12,10 @@ jobs:
       fail-fast: false
       matrix:
         cfg:
+          - { PHP_VERSION: php73-fpm, MAGENTO_VERSION: 2.3.7-p4, SAMPLE_DATA: false }
+          - { PHP_VERSION: php73-fpm, MAGENTO_VERSION: 2.3.7-p4, SAMPLE_DATA: true }
+          - { PHP_VERSION: php74-fpm, MAGENTO_VERSION: 2.3.7-p4, SAMPLE_DATA: false }
+          - { PHP_VERSION: php74-fpm, MAGENTO_VERSION: 2.3.7-p4, SAMPLE_DATA: true }
           - { PHP_VERSION: php73-fpm, MAGENTO_VERSION: 2.3.7-p3, SAMPLE_DATA: false }
           - { PHP_VERSION: php73-fpm, MAGENTO_VERSION: 2.3.7-p3, SAMPLE_DATA: true }
           - { PHP_VERSION: php74-fpm, MAGENTO_VERSION: 2.3.7-p3, SAMPLE_DATA: false }
