@@ -16,6 +16,7 @@ COPY patches/vertex-compilation-issue.patch vertex-compilation-issue.patch
 COPY patches/APSB22-12/MDVA-43395_EE_2.4.3-p1_COMPOSER_v1.patch MDVA-43395_EE_2.4.3-p1_COMPOSER_v1.patch
 COPY patches/APSB22-12/MDVA-43443_EE_2.3.4_COMPOSER_v1.patch MDVA-43443_EE_2.3.4_COMPOSER_v1.patch
 COPY patches/APSB22-12/MDVA-43443_EE_2.4.2-p2_COMPOSER_v1.patch MDVA-43443_EE_2.4.2-p2_COMPOSER_v1.patch
+COPY templates/memory-limit-php.ini /usr/local/etc/php/conf.d/memory-limit-php.ini
 
 # Comes from Github Actions
 COPY vendor /data/vendor

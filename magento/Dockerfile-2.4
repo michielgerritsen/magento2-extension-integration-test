@@ -15,6 +15,7 @@ COPY patches/ patches/
 COPY scripts/apply-2.4-patches.php scripts/apply-2.4-patches.php
 COPY scripts/downgrade-monolog.php scripts/downgrade-monolog.php
 COPY scripts/allow-composer-plugins.php scripts/allow-composer-plugins.php
+COPY templates/memory-limit-php.ini /usr/local/etc/php/conf.d/memory-limit-php.ini
 
 # Comes from Github Actions
 COPY vendor /data/vendor
