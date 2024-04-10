@@ -22,8 +22,9 @@ $isP4 = substr($version, 6, 8) == 'p4';
 $isP5 = substr($version, 6, 8) == 'p5';
 $isP6 = substr($version, 6, 8) == 'p6';
 $isP7 = substr($version, 6, 8) == 'p7';
+$isP8 = substr($version, 6, 8) == 'p8';
 
-if (($is244 && ($isP1 || $isP2 || $isP3 || $isP4 || $isP5 || $isP6 || $isP7)) || $is245 || $is246 || $is247) {
+if (($is244 && ($isP1 || $isP2 || $isP3 || $isP4 || $isP5 || $isP6 || $isP7 || $isP8)) || $is245 || $is246 || $is247) {
     echo 'No monolog changes needed, skipping' . PHP_EOL;
     return;
 }
