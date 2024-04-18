@@ -12,16 +12,14 @@ jobs:
       fail-fast: false
       matrix:
         cfg:
-          - { PHP_VERSION: php83-fpm, MAGENTO_VERSION: 2.4.7-beta3, SAMPLE_DATA: false }
-          - { PHP_VERSION: php83-fpm, MAGENTO_VERSION: 2.4.7-beta3, SAMPLE_DATA: true }
-          - { PHP_VERSION: php82-fpm, MAGENTO_VERSION: 2.4.7-beta3, SAMPLE_DATA: false }
-          - { PHP_VERSION: php82-fpm, MAGENTO_VERSION: 2.4.7-beta3, SAMPLE_DATA: true }
-          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.7-beta3, SAMPLE_DATA: false }
-          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.7-beta3, SAMPLE_DATA: true }
-          - { PHP_VERSION: php82-fpm, MAGENTO_VERSION: 2.4.7-beta2, SAMPLE_DATA: false }
-          - { PHP_VERSION: php82-fpm, MAGENTO_VERSION: 2.4.7-beta2, SAMPLE_DATA: true }
-          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.7-beta2, SAMPLE_DATA: false }
-          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.7-beta2, SAMPLE_DATA: true }
+          - { PHP_VERSION: php83-fpm, MAGENTO_VERSION: 2.4.7, SAMPLE_DATA: false }
+          - { PHP_VERSION: php83-fpm, MAGENTO_VERSION: 2.4.7, SAMPLE_DATA: true }
+          - { PHP_VERSION: php82-fpm, MAGENTO_VERSION: 2.4.7, SAMPLE_DATA: false }
+          - { PHP_VERSION: php82-fpm, MAGENTO_VERSION: 2.4.7, SAMPLE_DATA: true }
+          - { PHP_VERSION: php82-fpm, MAGENTO_VERSION: 2.4.6-p5, SAMPLE_DATA: false }
+          - { PHP_VERSION: php82-fpm, MAGENTO_VERSION: 2.4.6-p5, SAMPLE_DATA: true }
+          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.6-p5, SAMPLE_DATA: false }
+          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.6-p5, SAMPLE_DATA: true }
           - { PHP_VERSION: php82-fpm, MAGENTO_VERSION: 2.4.6-p4, SAMPLE_DATA: false }
           - { PHP_VERSION: php82-fpm, MAGENTO_VERSION: 2.4.6-p4, SAMPLE_DATA: true }
           - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.6-p4, SAMPLE_DATA: false }
@@ -44,6 +42,8 @@ jobs:
           - { PHP_VERSION: php82-fpm, MAGENTO_VERSION: 2.4.6, SAMPLE_DATA: true }
           - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.6, SAMPLE_DATA: false }
           - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.6, SAMPLE_DATA: true }
+          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.5-p7, SAMPLE_DATA: false }
+          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.5-p7, SAMPLE_DATA: true }
           - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.5-p6, SAMPLE_DATA: false }
           - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.5-p6, SAMPLE_DATA: true }
           - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.5-p5, SAMPLE_DATA: false }
@@ -58,6 +58,8 @@ jobs:
           - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.5-p1, SAMPLE_DATA: true }
           - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.5, SAMPLE_DATA: false }
           - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.5, SAMPLE_DATA: true }
+          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.4-p8, SAMPLE_DATA: false }
+          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.4-p8, SAMPLE_DATA: true }
           - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.4-p7, SAMPLE_DATA: false }
           - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.4-p7, SAMPLE_DATA: true }
           - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.4-p6, SAMPLE_DATA: false }
@@ -82,8 +84,8 @@ jobs:
           - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.4-p1, SAMPLE_DATA: true }
           - { PHP_VERSION: php74-fpm, MAGENTO_VERSION: 2.4.4, SAMPLE_DATA: false }
           - { PHP_VERSION: php74-fpm, MAGENTO_VERSION: 2.4.4, SAMPLE_DATA: true }
-          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.4, SAMPLE_DATA: false }
-          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.4, SAMPLE_DATA: true }
+#          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.4, SAMPLE_DATA: false }
+#          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.4, SAMPLE_DATA: true }
           - { PHP_VERSION: php74-fpm, MAGENTO_VERSION: 2.4.3-p2, SAMPLE_DATA: false }
           - { PHP_VERSION: php74-fpm, MAGENTO_VERSION: 2.4.3-p2, SAMPLE_DATA: true }
           - { PHP_VERSION: php73-fpm, MAGENTO_VERSION: 2.4.3-p1, SAMPLE_DATA: false }
@@ -124,15 +126,6 @@ jobs:
           - { PHP_VERSION: php74-fpm, MAGENTO_VERSION: 2.4.0, SAMPLE_DATA: true }
     steps:
     - uses: actions/checkout@v1
-
-    - name: Cache Composer packages
-      uses: actions/cache@v3
-      with:
-        path: magento/vendor
-        key: ${{ matrix.cfg.PHP_VERSION }}-magento${{ matrix.cfg.MAGENTO_VERSION }}
-
-    - name: Create vendor folder
-      run: mkdir magento/vendor || echo "Vendor folder already exists"
 
     # Step 1: Build the docker image
     - name: Build the Docker image (without sample data)
@@ -198,9 +191,6 @@ jobs:
     - name: Push the image to Docker hub (with sample data)
       if: github.ref == 'refs/heads/master' && matrix.cfg.SAMPLE_DATA == true
       run: docker push michielgerritsen/magento-project-community-edition:${{ matrix.cfg.PHP_VERSION }}-magento${{ matrix.cfg.MAGENTO_VERSION }}-sample-data
-
-    - name: Copy the vendor folder for caching
-      run: docker cp magento-project-community-edition:/data/vendor magento/vendor
 
     - name: Dump Docker logs files (on failure)
       if: failure()
