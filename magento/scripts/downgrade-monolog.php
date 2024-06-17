@@ -11,10 +11,15 @@ use Composer\Semver\VersionParser;
 require '/data/vendor/autoload.php';
 
 $version = getenv('MAGENTO_VERSION');
+$is240 = substr($version, 0, 5) == '2.4.0';
+$is241 = substr($version, 0, 5) == '2.4.1';
+$is242 = substr($version, 0, 5) == '2.4.2';
+$is243 = substr($version, 0, 5) == '2.4.3';
 $is244 = substr($version, 0, 5) == '2.4.4';
 $is245 = substr($version, 0, 5) == '2.4.5';
 $is246 = substr($version, 0, 5) == '2.4.6';
 $is247 = substr($version, 0, 5) == '2.4.7';
+$isP0 = strlen($version) == 5;
 $isP1 = substr($version, 6, 8) == 'p1';
 $isP2 = substr($version, 6, 8) == 'p2';
 $isP3 = substr($version, 6, 8) == 'p3';
@@ -23,8 +28,9 @@ $isP5 = substr($version, 6, 8) == 'p5';
 $isP6 = substr($version, 6, 8) == 'p6';
 $isP7 = substr($version, 6, 8) == 'p7';
 $isP8 = substr($version, 6, 8) == 'p8';
+$isP9 = substr($version, 6, 8) == 'p9';
 
-if (($is244 && ($isP1 || $isP2 || $isP3 || $isP4 || $isP5 || $isP6 || $isP7 || $isP8)) || $is245 || $is246 || $is247) {
+if (($is244 && !$isP0) || $is245 || $is246 || $is247) {
     echo 'No monolog changes needed, skipping' . PHP_EOL;
     return;
 }

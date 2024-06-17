@@ -15,6 +15,7 @@ COPY patches/ patches/
 COPY scripts/apply-2.4-patches.php scripts/apply-2.4-patches.php
 COPY scripts/downgrade-monolog.php scripts/downgrade-monolog.php
 COPY scripts/allow-composer-plugins.php scripts/allow-composer-plugins.php
+COPY scripts/remove-paypal-braintree.php scripts/remove-paypal-braintree.php
 COPY templates/memory-limit-php.ini /usr/local/etc/php/conf.d/memory-limit-php.ini
 
 RUN ./start-services && \
@@ -29,6 +30,7 @@ RUN ./start-services && \
     composer config repositories.fooman composer https://repo-magento-mirror.fooman.co.nz/ && \
     ./retry "composer install" && \
     php scripts/downgrade-monolog.php && \
+    php scripts/remove-paypal-braintree.php && \
     if [ -f "/data/vendor/magento/module-inventory-catalog/etc/communication.xml" ]; then sed -i 's/is_synchronous="false"//g' /data/vendor/magento/module-inventory-catalog/etc/communication.xml; fi && \
     if [ -f "/data/vendor/magento/module-inventory-sales/etc/communication.xml" ]; then sed -i 's/is_synchronous="false"//g' /data/vendor/magento/module-inventory-sales/etc/communication.xml; fi && \
     if [ -f "/data/vendor/magento/module-inventory-indexer/etc/communication.xml" ]; then sed -i 's/is_synchronous="false"//g' /data/vendor/magento/module-inventory-indexer/etc/communication.xml; fi && \
