@@ -4,6 +4,7 @@ $composerPlugins = [
     'captainhook/plugin-composer',
     'dealerdirect/phpcodesniffer-composer-installer',
     'laminas/laminas-dependency-plugin',
+    'phpstan/extension-installer',
     'magento/*',
 ];
 
