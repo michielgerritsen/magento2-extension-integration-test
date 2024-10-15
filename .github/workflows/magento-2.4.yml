@@ -12,6 +12,10 @@ jobs:
       fail-fast: false
       matrix:
         cfg:
+          - { PHP_VERSION: php83-fpm, MAGENTO_VERSION: 2.4.7-p3, SAMPLE_DATA: false }
+          - { PHP_VERSION: php83-fpm, MAGENTO_VERSION: 2.4.7-p3, SAMPLE_DATA: true }
+          - { PHP_VERSION: php82-fpm, MAGENTO_VERSION: 2.4.7-p3, SAMPLE_DATA: false }
+          - { PHP_VERSION: php82-fpm, MAGENTO_VERSION: 2.4.7-p3, SAMPLE_DATA: true }
           - { PHP_VERSION: php83-fpm, MAGENTO_VERSION: 2.4.7-p2, SAMPLE_DATA: false }
           - { PHP_VERSION: php83-fpm, MAGENTO_VERSION: 2.4.7-p2, SAMPLE_DATA: true }
           - { PHP_VERSION: php82-fpm, MAGENTO_VERSION: 2.4.7-p2, SAMPLE_DATA: false }
@@ -24,6 +28,10 @@ jobs:
           - { PHP_VERSION: php83-fpm, MAGENTO_VERSION: 2.4.7, SAMPLE_DATA: true }
           - { PHP_VERSION: php82-fpm, MAGENTO_VERSION: 2.4.7, SAMPLE_DATA: false }
           - { PHP_VERSION: php82-fpm, MAGENTO_VERSION: 2.4.7, SAMPLE_DATA: true }
+          - { PHP_VERSION: php82-fpm, MAGENTO_VERSION: 2.4.6-p8, SAMPLE_DATA: false }
+          - { PHP_VERSION: php82-fpm, MAGENTO_VERSION: 2.4.6-p8, SAMPLE_DATA: true }
+          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.6-p8, SAMPLE_DATA: false }
+          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.6-p8, SAMPLE_DATA: true }
           - { PHP_VERSION: php82-fpm, MAGENTO_VERSION: 2.4.6-p7, SAMPLE_DATA: false }
           - { PHP_VERSION: php82-fpm, MAGENTO_VERSION: 2.4.6-p7, SAMPLE_DATA: true }
           - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.6-p7, SAMPLE_DATA: false }
@@ -58,6 +66,8 @@ jobs:
           - { PHP_VERSION: php82-fpm, MAGENTO_VERSION: 2.4.6, SAMPLE_DATA: true }
           - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.6, SAMPLE_DATA: false }
           - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.6, SAMPLE_DATA: true }
+          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.5-p10, SAMPLE_DATA: false }
+          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.5-p10, SAMPLE_DATA: true }
           - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.5-p9, SAMPLE_DATA: false }
           - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.5-p9, SAMPLE_DATA: true }
           - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.5-p8, SAMPLE_DATA: false }
@@ -80,6 +90,10 @@ jobs:
           - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.5, SAMPLE_DATA: true }
           # 2.4.4 + 8.1 is disabled due to this bug:
           # https://github.com/magento/magento2/issues/35292
+#          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.4-p11, SAMPLE_DATA: false }
+#          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.4-p11, SAMPLE_DATA: true }
+          - { PHP_VERSION: php74-fpm, MAGENTO_VERSION: 2.4.4-p11, SAMPLE_DATA: false }
+          - { PHP_VERSION: php74-fpm, MAGENTO_VERSION: 2.4.4-p11, SAMPLE_DATA: true }
 #          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.4-p10, SAMPLE_DATA: false }
 #          - { PHP_VERSION: php81-fpm, MAGENTO_VERSION: 2.4.4-p10, SAMPLE_DATA: true }
           - { PHP_VERSION: php74-fpm, MAGENTO_VERSION: 2.4.4-p10, SAMPLE_DATA: false }
