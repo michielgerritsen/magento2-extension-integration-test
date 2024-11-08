@@ -29,6 +29,8 @@ RUN ./start-services && \
     if (( $(php -r 'echo version_compare(getenv("MAGENTO_VERSION"), "2.4.2", "<=") ? "true" : "false";') = "true" )); then echo "Using Composer version 1 so skipping allow-plugins"; else php scripts/allow-composer-plugins.php rm scripts/allow-composer-plugins.php; fi && \
     composer config --unset repositories.0 && \
     composer config repositories.fooman composer https://repo-magento-mirror.fooman.co.nz/ && \
+    if [ "$MAGENTO_VERSION" = "2.4.4" ]; then composer require "magento/security-package:1.1.3-p1 as 1.1.3" --no-update; fi && \
+    if [ "$MAGENTO_VERSION" = "2.4.4" ]; then composer require "magento/inventory-metapackage:1.2.4-p1 as 1.2.4" --no-update; fi && \
     ./retry "composer install" && \
     php scripts/patch-AC2855.php && \
     php scripts/downgrade-monolog.php && \

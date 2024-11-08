@@ -3,9 +3,8 @@
 
 $version = getenv('MAGENTO_VERSION');
 $is244 = substr($version, 0, 5) == '2.4.4';
-$patchLevel = (int)substr($version, 7);
 
-if (!$is244 || $patchLevel > 100) {
+if (!$is244) {
     echo 'AC2855 Breaking bug does not exist in this version' . PHP_EOL;
     exit(0);
 }
@@ -19,3 +18,5 @@ if ($code !== 0) {
     echo implode(PHP_EOL, $output);
     exit($code);
 }
+
+echo 'Applied patch AC2855' . PHP_EOL;
