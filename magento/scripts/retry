@@ -11,6 +11,7 @@ cmd=$1
 
 # Execute the command until it succeeds or the maximum number of retries is reached
 while ! eval $cmd && [ $retries -lt $max_retries ]; do
+  echo "Command failed. Retry attempt $retries"
   retries=$((retries+1))
   sleep 1
 done
