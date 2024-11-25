@@ -48,10 +48,14 @@ jobs:
           - { PHP_VERSION: php72-fpm, MAGENTO_VERSION: 2.3.5-p1, SAMPLE_DATA: true }
           - { PHP_VERSION: php73-fpm, MAGENTO_VERSION: 2.3.5-p1, SAMPLE_DATA: false }
           - { PHP_VERSION: php73-fpm, MAGENTO_VERSION: 2.3.5-p1, SAMPLE_DATA: true }
-          - { PHP_VERSION: php72-fpm, MAGENTO_VERSION: 2.3.4, SAMPLE_DATA: false }
-          - { PHP_VERSION: php72-fpm, MAGENTO_VERSION: 2.3.4, SAMPLE_DATA: true }
-          - { PHP_VERSION: php73-fpm, MAGENTO_VERSION: 2.3.4, SAMPLE_DATA: false }
-          - { PHP_VERSION: php73-fpm, MAGENTO_VERSION: 2.3.4, SAMPLE_DATA: true }
+          # 2.3.4 is disabled as I get a lot of these errors after switchting to Composer 2:
+          # Problem 1
+          #  - Root composer.json requires zendframework/zend-barcode == 2.8.0.0 -> satisfiable by laminas/laminas-barcode[2.8.0].
+          #  - laminas/laminas-barcode 2.8.0 requires laminas/laminas-zendframework-bridge ^1.0 -> found laminas/laminas-zendframework-bridge[1.0.0, ..., 1.8.0] but these were not loaded, likely because it conflicts with another require.
+#          - { PHP_VERSION: php72-fpm, MAGENTO_VERSION: 2.3.4, SAMPLE_DATA: false }
+#          - { PHP_VERSION: php72-fpm, MAGENTO_VERSION: 2.3.4, SAMPLE_DATA: true }
+#          - { PHP_VERSION: php73-fpm, MAGENTO_VERSION: 2.3.4, SAMPLE_DATA: false }
+#          - { PHP_VERSION: php73-fpm, MAGENTO_VERSION: 2.3.4, SAMPLE_DATA: true }
           - { PHP_VERSION: php72-fpm, MAGENTO_VERSION: 2.3.3, SAMPLE_DATA: false }
           - { PHP_VERSION: php72-fpm, MAGENTO_VERSION: 2.3.3, SAMPLE_DATA: true }
           - { PHP_VERSION: php73-fpm, MAGENTO_VERSION: 2.3.3, SAMPLE_DATA: false }
