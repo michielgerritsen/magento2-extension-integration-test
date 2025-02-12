@@ -21,7 +21,7 @@ docker run -d --rm \
     -p 3307:3306 \
     -e URL=http://localhost:1234/ \
     -e FLAT_TABLES=false \
-    michielgerritsen/magento-project-community-edition:php74-fpm-magento2.4.2
+    michielgerritsen/magento-project-community-edition:php83-fpm-magento2.4.7-p4
 ```
 
 ### Docker Compose
@@ -31,7 +31,7 @@ version: '3'
 services:
   magento:
     container_name: magento
-    image: michielgerritsen/magento-project-community-edition:php74-fpm-magento2.4.2
+    image: michielgerritsen/magento-project-community-edition:php83-fpm-magento2.4.7-p4
     ports:
       - 1234:80
       - 3307:3306
@@ -81,7 +81,6 @@ Special thanks to Fooman for providing a Magento 2 mirror that does not requires
 
 | Magento version | PHP 8.4 | PHP 8.3 | PHP 8.2 | PHP 8.1 | PHP 7.4 | PHP 7.3 | PHP 7.2 |
 |-----------------|---------|---------|---------|---------|---------|---------|---------|
-| 2.4.8-beta2     | x       | x       | -       | -       | -       | -       | -       |
 | 2.4.7-p4        | -       | x       | x       | -       | -       | -       | -       |
 | 2.4.7-p3        | -       | x       | x       | -       | -       | -       | -       |
 | 2.4.7-p2        | -       | x       | x       | -       | -       | -       | -       |
