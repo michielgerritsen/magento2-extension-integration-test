@@ -72,6 +72,7 @@
         <!--<const name="MONGODB_DATABASE_NAME" value="magento_integration_tests"/>-->
         <!-- Connection parameters for RabbitMQ tests -->
         <!--<const name="RABBITMQ_MANAGEMENT_PORT" value="15672"/>-->
+        <const name="USE_OVERRIDE_CONFIG" value="enabled"/>
     </php>
     <!-- Test listeners -->
     <listeners>
