@@ -92,7 +92,7 @@ COPY templates/phpunit-integration.xml dev/tests/integration/phpunit.xml
 COPY templates/phpunit-integration-248.xml dev/tests/integration/phpunit-248.xml
 
 RUN chmod +x enable-flat-catalog && chmod +x change-base-url && \
-    if [ "$MAGENTO_VERSION" = "2.4.8-beta2" ]; then cp dev/tests/integration/phpunit-248.xml dev/tests/integration/phpunit.xml; fi && \
+    if [ "$MAGENTO_VERSION" = "2.4.8" ]; then cp dev/tests/integration/phpunit-248.xml dev/tests/integration/phpunit.xml; fi && \
     rm dev/tests/integration/phpunit-248.xml
 
 ENTRYPOINT ["/bin/bash", "entrypoint.sh"]
