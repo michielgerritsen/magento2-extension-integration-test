@@ -1,0 +1,9 @@
+{
+  "name": "michielgerritsen/exampletest",
+  "description": "Example test",
+  "autoload": {
+    "psr-4": {
+      "MichielGerritsen\\ExampleTest\\": "./"
+    }
+  }
+}

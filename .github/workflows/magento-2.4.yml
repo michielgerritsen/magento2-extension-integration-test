@@ -26,6 +26,8 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - run: docker image ls
+
     # Step 1: Build the docker image
     - name: Build the Docker image (without sample data)
       if: matrix.cfg.SAMPLE_DATA == false
@@ -46,6 +48,8 @@ jobs:
         --build-arg PHP_VERSION=${{ matrix.cfg.PHP_VERSION }}
         --build-arg SAMPLE_DATA=true
 
+    - run: docker image ls
+
     # Step 2: Test the docker image
     - name: Start the docker image (without sample date)
       if: matrix.cfg.SAMPLE_DATA == false
@@ -59,8 +63,24 @@ jobs:
         docker run --detach --name magento-project-community-edition
         michielgerritsen/magento-project-community-edition:${{ matrix.cfg.PHP_VERSION }}-magento${{ matrix.cfg.MAGENTO_VERSION }}-sample-data
 
-    - name: Create the dummy test directory
-      run: docker exec magento-project-community-edition mkdir -p /data/app/code/MichielGerritsen/Magento2ExtensionIntegrationTest/Test/Integration
+    - run: docker image ls
+
+    - name: Inspect container image ID
+      id: inspect
+      run: |
+        CONTAINER_IMAGE_ID=$(docker inspect --format='{{.Image}}' magento-project-community-edition)
+        echo "Container image ID: $CONTAINER_IMAGE_ID"
+
+    - name: Debug
+      continue-on-error: true
+      run: docker exec magento-project-community-edition cat /data/generated/code/Psr/Log/LoggerInterface/Proxy.php
+
+    - name: Enable developer mode
+      run: docker exec magento-project-community-edition ./retry "bin/magento deploy:mode:set developer"
+
+    - name: Debug
+      continue-on-error: true
+      run: docker exec magento-project-community-edition cat /data/generated/code/Psr/Log/LoggerInterface/Proxy.php
 
     - name: Copy the example test module
       run: |
@@ -68,17 +88,51 @@ jobs:
         docker cp Test/composer.json magento-project-community-edition:/data/extensions/MichielGerritsen-ExampleTest/
         docker cp Test/ExampleTest.php magento-project-community-edition:/data/extensions/MichielGerritsen-ExampleTest/Test/Integration/
 
-    - name: Install the example test module
-      run: docker exec magento-project-community-edition composer require michielgerritsen/exampletest:@dev
+    - name: Debug
+      continue-on-error: true
+      run: docker exec magento-project-community-edition cat /data/generated/code/Psr/Log/LoggerInterface/Proxy.php
 
     - name: Enable developer mode
       run: docker exec magento-project-community-edition ./retry "bin/magento deploy:mode:set developer"
 
+    - name: Debug
+      continue-on-error: true
+      run: docker exec magento-project-community-edition cat /data/generated/code/Psr/Log/LoggerInterface/Proxy.php
+
+    - name: Install the example test module
+      run: docker exec magento-project-community-edition composer require michielgerritsen/exampletest:@dev
+
+    - name: Debug
+      continue-on-error: true
+      run: docker exec magento-project-community-edition cat /data/generated/code/Psr/Log/LoggerInterface/Proxy.php
+
+    - name: Enable developer mode
+      run: docker exec magento-project-community-edition ./retry "bin/magento deploy:mode:set developer"
+
+    - name: Debug
+      continue-on-error: true
+      run: docker exec magento-project-community-edition cat /data/generated/code/Psr/Log/LoggerInterface/Proxy.php
+
+    - name: Enable developer mode
+      run: docker exec magento-project-community-edition ./retry "bin/magento deploy:mode:set developer"
+
+    - name: Debug
+      continue-on-error: true
+      run: docker exec magento-project-community-edition cat /data/generated/code/Psr/Log/LoggerInterface/Proxy.php
+
     - name: Run setup:di:compile
       run: docker exec magento-project-community-edition ./retry "php bin/magento setup:di:compile"
 
+    - name: Debug
+      continue-on-error: true
+      run: docker exec magento-project-community-edition cat /data/generated/code/Psr/Log/LoggerInterface/Proxy.php
+
     - name: Run the example test
       run: docker exec magento-project-community-edition bash -c "cd /data/dev/tests/integration/ && ../../../vendor/bin/phpunit /data/vendor/michielgerritsen/exampletest/Test/Integration/ExampleTest.php"
+
+    - name: Debug
+      continue-on-error: true
+      run: docker exec magento-project-community-edition cat /data/generated/code/Psr/Log/LoggerInterface/Proxy.php
 
     # Step 3: Upload the images to Docker Hub.
     - name: Docker hub login
