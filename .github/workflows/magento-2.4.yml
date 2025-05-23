@@ -23,6 +23,25 @@ jobs:
           - { PHP_VERSION: php82-fpm, MAGENTO_VERSION: 2.4.7-p5, SAMPLE_DATA: false }
           - { PHP_VERSION: php82-fpm, MAGENTO_VERSION: 2.4.7-p5, SAMPLE_DATA: true }
           - { PHP_VERSION: php83-fpm, MAGENTO_VERSION: 2.4.7-p4, SAMPLE_DATA: false }
+          - { PHP_VERSION: php83-fpm, MAGENTO_VERSION: 2.4.7-p4, SAMPLE_DATA: true }
+          - { PHP_VERSION: php82-fpm, MAGENTO_VERSION: 2.4.7-p4, SAMPLE_DATA: false }
+          - { PHP_VERSION: php82-fpm, MAGENTO_VERSION: 2.4.7-p4, SAMPLE_DATA: true }
+          - { PHP_VERSION: php83-fpm, MAGENTO_VERSION: 2.4.7-p3, SAMPLE_DATA: false }
+          - { PHP_VERSION: php83-fpm, MAGENTO_VERSION: 2.4.7-p3, SAMPLE_DATA: true }
+          - { PHP_VERSION: php82-fpm, MAGENTO_VERSION: 2.4.7-p3, SAMPLE_DATA: false }
+          - { PHP_VERSION: php82-fpm, MAGENTO_VERSION: 2.4.7-p3, SAMPLE_DATA: true }
+          - { PHP_VERSION: php83-fpm, MAGENTO_VERSION: 2.4.7-p2, SAMPLE_DATA: false }
+          - { PHP_VERSION: php83-fpm, MAGENTO_VERSION: 2.4.7-p2, SAMPLE_DATA: true }
+          - { PHP_VERSION: php82-fpm, MAGENTO_VERSION: 2.4.7-p2, SAMPLE_DATA: false }
+          - { PHP_VERSION: php82-fpm, MAGENTO_VERSION: 2.4.7-p2, SAMPLE_DATA: true }
+          - { PHP_VERSION: php83-fpm, MAGENTO_VERSION: 2.4.7-p1, SAMPLE_DATA: false }
+          - { PHP_VERSION: php83-fpm, MAGENTO_VERSION: 2.4.7-p1, SAMPLE_DATA: true }
+          - { PHP_VERSION: php82-fpm, MAGENTO_VERSION: 2.4.7-p1, SAMPLE_DATA: false }
+          - { PHP_VERSION: php82-fpm, MAGENTO_VERSION: 2.4.7-p1, SAMPLE_DATA: true }
+          - { PHP_VERSION: php83-fpm, MAGENTO_VERSION: 2.4.7, SAMPLE_DATA: false }
+          - { PHP_VERSION: php83-fpm, MAGENTO_VERSION: 2.4.7, SAMPLE_DATA: true }
+          - { PHP_VERSION: php82-fpm, MAGENTO_VERSION: 2.4.7, SAMPLE_DATA: false }
+          - { PHP_VERSION: php82-fpm, MAGENTO_VERSION: 2.4.7, SAMPLE_DATA: true }
     steps:
     - uses: actions/checkout@v4
 
@@ -59,8 +78,8 @@ jobs:
         docker run --detach --name magento-project-community-edition
         michielgerritsen/magento-project-community-edition:${{ matrix.cfg.PHP_VERSION }}-magento${{ matrix.cfg.MAGENTO_VERSION }}-sample-data
 
-    - name: Create the dummy test directory
-      run: docker exec magento-project-community-edition mkdir -p /data/app/code/MichielGerritsen/Magento2ExtensionIntegrationTest/Test/Integration
+    - name: Enable developer mode
+      run: docker exec magento-project-community-edition ./retry "bin/magento deploy:mode:set developer"
 
     - name: Copy the example test module
       run: |
@@ -68,17 +87,29 @@ jobs:
         docker cp Test/composer.json magento-project-community-edition:/data/extensions/MichielGerritsen-ExampleTest/
         docker cp Test/ExampleTest.php magento-project-community-edition:/data/extensions/MichielGerritsen-ExampleTest/Test/Integration/
 
-    - name: Install the example test module
-      run: docker exec magento-project-community-edition composer require michielgerritsen/exampletest:@dev
+    - name: Debug
+      continue-on-error: true
+      run: docker exec magento-project-community-edition cat /data/generated/code/Psr/Log/LoggerInterface/Proxy.php
 
     - name: Enable developer mode
       run: docker exec magento-project-community-edition ./retry "bin/magento deploy:mode:set developer"
 
+    - name: Install the example test module
+      run: docker exec magento-project-community-edition composer require michielgerritsen/exampletest:@dev
+
+    - name: Debug
+      continue-on-error: true
+      run: docker exec magento-project-community-edition cat /data/generated/code/Psr/Log/LoggerInterface/Proxy.php
+
     - name: Run setup:di:compile
       run: docker exec magento-project-community-edition ./retry "php bin/magento setup:di:compile"
 
+    - name: Debug
+      continue-on-error: true
+      run: docker exec magento-project-community-edition cat /data/generated/code/Psr/Log/LoggerInterface/Proxy.php
+
     - name: Run the example test
-      run: docker exec magento-project-community-edition bash -c "cd /data/dev/tests/integration/ && ../../../vendor/bin/phpunit /data/vendor/michielgerritsen/exampletest/Test/Integration/ExampleTest.php"
+      run: docker exec magento-project-community-edition ./run-integration-tests /data/vendor/michielgerritsen/exampletest/Test/Integration/ExampleTest.php
 
     # Step 3: Upload the images to Docker Hub.
     - name: Docker hub login

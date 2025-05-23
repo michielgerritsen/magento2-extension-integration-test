@@ -1,0 +1,3 @@
+#!/bin/bash
+
+cd /data/dev/tests/integration/ && ../../../vendor/bin/phpunit "${1:-/data/extensions/}"

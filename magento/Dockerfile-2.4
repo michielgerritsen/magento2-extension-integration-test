@@ -20,14 +20,15 @@ COPY scripts/upgrade-to-composer-2.php scripts/upgrade-to-composer-2.php
 COPY scripts/allow-composer-plugins.php scripts/allow-composer-plugins.php
 COPY scripts/remove-paypal-braintree.php scripts/remove-paypal-braintree.php
 COPY scripts/patch-AC2855.php scripts/patch-AC2855.php
+COPY scripts/run-integration-tests run-integration-tests
 COPY templates/memory-limit-php.ini /usr/local/etc/php/conf.d/memory-limit-php.ini
 
-COPY Test/composer.json extensions/MichielGerritsen-ExampleTest/
-COPY Test/ExampleTest.php extensions/MichielGerritsen-ExampleTest/Test/Integration/
+COPY Test/composer.json extensions/MichielGerritsen-ExampleTest/composer.json
+COPY Test/ExampleTest.php extensions/MichielGerritsen-ExampleTest/Test/Integration/ExampleTest.php
 
 RUN set -e; \
     ./start-services && \
-    composer self-update --2 && \
+    composer self-update 2.5.8 && \
     echo "[cad] Composer version:" && \
     composer --version && \
     if [ "$MAGENTO_VERSION" = "2.4.8-beta2" ]; then \
@@ -56,7 +57,6 @@ RUN set -e; \
     if [ "$MAGENTO_VERSION" = "2.4.4" ]; then composer require "magento/inventory-metapackage:1.2.4-p1 as 1.2.4" --no-update; fi && \
     echo "[cad] Running Composer install" && \
     ./retry "composer install" && \
-    ./retry "composer remove magento/magento2-functional-testing-framework" && \
     php scripts/patch-AC2855.php && \
     php scripts/downgrade-monolog.php && \
     php scripts/fix-monolog.php && \
@@ -70,6 +70,7 @@ RUN set -e; \
     php bin/magento setup:install --backend-frontname=admin --session-save=db --db-host=127.0.0.1 --db-name=magento --db-user=magento --db-password=password --base-url=http://localhost --timezone=Europe/Amsterdam --currency=EUR --admin-user=exampleuser --admin-password=examplepassword123 --admin-email=user@example.com --admin-firstname=Example --admin-lastname=Example --use-rewrites=1 --use-sample-data && \
     echo "[cad] Setting developer mode" && \
     php bin/magento setup:di:compile && \
+    cat /data/generated/code/Psr/Log/LoggerInterface/Proxy.php && \
     mkdir -p extensions && \
     composer config repositories.dev-extensions path extensions/* && \
     composer require --dev phpstan/phpstan bitexpert/phpstan-magento phpstan/extension-installer && \
@@ -77,15 +78,21 @@ RUN set -e; \
     if [ "${SAMPLE_DATA}" = "true" ] && [ "$MAGENTO_VERSION" = "2.4.8-beta2" ]; then echo "[cad] Installing sampledata"; composer require magento/module-bundle-sample-data magento/module-catalog-sample-data magento/module-sales-sample-data magento/module-customer-sample-data magento/module-cms-sample-data magento/module-widget-sample-data magento/module-theme-sample-data magento/module-downloadable-sample-data magento/module-wishlist-sample-data magento/module-review-sample-data magento/module-tax-sample-data magento/module-catalog-rule-sample-data magento/module-configurable-sample-data magento/module-product-links-sample-data magento/module-sales-rule-sample-data magento/module-msrp-sample-data magento/module-grouped-product-sample-data magento/module-swatches-sample-data magento/module-offline-shipping-sample-data magento/sample-data-media --ignore-platform-reqs; fi && \
     if [ "${SAMPLE_DATA}" = "true" ]; then echo "[cad] Running setup:upgrade" && ./retry "php bin/magento setup:upgrade"; fi && \
     php bin/magento setup:static-content:deploy en_US -f -j 12 && \
+    cat /data/generated/code/Psr/Log/LoggerInterface/Proxy.php && \
     php bin/magento indexer:reindex && \
+    cat /data/generated/code/Psr/Log/LoggerInterface/Proxy.php && \
     php scripts/apply-2.4-patches.php && \
+    cat /data/generated/code/Psr/Log/LoggerInterface/Proxy.php && \
     rm scripts/apply-2.4-patches.php && \
+    cat /data/generated/code/Psr/Log/LoggerInterface/Proxy.php && \
     rm scripts/downgrade-monolog.php && \
+    cat /data/generated/code/Psr/Log/LoggerInterface/Proxy.php && \
     rm scripts/fix-monolog.php && \
+    cat /data/generated/code/Psr/Log/LoggerInterface/Proxy.php && \
     composer require michielgerritsen/exampletest:@dev && \
-    cd /data/dev/tests/integration/ && ../../../vendor/bin/phpunit /data/vendor/michielgerritsen/exampletest/Test/Integration/ExampleTest.php && \
-    cd /data && \
-    ./stop-services
+    cat /data/generated/code/Psr/Log/LoggerInterface/Proxy.php && \
+    ./stop-services && \
+    cat /data/generated/code/Psr/Log/LoggerInterface/Proxy.php
 
 COPY templates/install-config-mysql.php dev/tests/integration/etc/
 COPY templates/post-install-setup-command-config.php dev/tests/integration/etc/
@@ -103,6 +110,8 @@ COPY templates/phpunit-integration-248.xml dev/tests/integration/phpunit-248.xml
 RUN chmod +x enable-flat-catalog && chmod +x change-base-url && \
     if [ "$MAGENTO_VERSION" = "2.4.8" ]; then cp dev/tests/integration/phpunit-248.xml dev/tests/integration/phpunit.xml; fi && \
     rm dev/tests/integration/phpunit-248.xml
+
+RUN cat /data/generated/code/Psr/Log/LoggerInterface/Proxy.php
 
 ENTRYPOINT ["/bin/bash", "entrypoint.sh"]
 
