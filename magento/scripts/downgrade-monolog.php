@@ -30,8 +30,13 @@ $isP7 = substr($version, 6, 8) == 'p7';
 $isP8 = substr($version, 6, 8) == 'p8';
 $isP9 = substr($version, 6, 8) == 'p9';
 
-if (($is244 && !$isP0) || $is245 || $is246 || $is247) {
-    echo 'No monolog changes needed, skipping' . PHP_EOL;
+if (!$is240 && !$is241 && !$is242 && !$is243 && !$is244) {
+    echo 'No monolog downgrade needed, skipping' . PHP_EOL;
+    return;
+}
+
+if (($is244 && !$isP0)) {
+    echo 'No monolog downgrade needed, skipping' . PHP_EOL;
     return;
 }
 

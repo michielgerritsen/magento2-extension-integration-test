@@ -15,6 +15,7 @@ COPY scripts/retry retry
 COPY patches/ patches/
 COPY scripts/apply-2.4-patches.php scripts/apply-2.4-patches.php
 COPY scripts/downgrade-monolog.php scripts/downgrade-monolog.php
+COPY scripts/fix-monolog.php scripts/fix-monolog.php
 COPY scripts/upgrade-to-composer-2.php scripts/upgrade-to-composer-2.php
 COPY scripts/allow-composer-plugins.php scripts/allow-composer-plugins.php
 COPY scripts/remove-paypal-braintree.php scripts/remove-paypal-braintree.php
@@ -54,6 +55,7 @@ RUN set -e; \
     ./retry "composer install" && \
     php scripts/patch-AC2855.php && \
     php scripts/downgrade-monolog.php && \
+    php scripts/fix-monolog.php && \
     php scripts/remove-paypal-braintree.php && \
     echo "[cad] Updating XML" && \
     if [ -f "/data/vendor/magento/module-inventory-catalog/etc/communication.xml" ]; then sed -i 's/is_synchronous="false"//g' /data/vendor/magento/module-inventory-catalog/etc/communication.xml; fi && \
@@ -76,6 +78,7 @@ RUN set -e; \
     php scripts/apply-2.4-patches.php && \
     rm scripts/apply-2.4-patches.php && \
     rm scripts/downgrade-monolog.php && \
+    rm scripts/fix-monolog.php && \
     ./stop-services
 
 COPY templates/install-config-mysql.php dev/tests/integration/etc/
