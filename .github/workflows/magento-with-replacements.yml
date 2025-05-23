@@ -71,6 +71,10 @@ jobs:
     - name: Copy the vendor folder for caching
       run: docker cp magento-project-community-edition:/data/vendor magento/vendor
 
+    - name: Setup upterm session
+      if: failure()
+      uses: lhotari/action-upterm@v1
+
     - name: Dump Docker logs files (on failure)
       if: failure()
       run: |
