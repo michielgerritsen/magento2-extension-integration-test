@@ -22,6 +22,9 @@ COPY scripts/remove-paypal-braintree.php scripts/remove-paypal-braintree.php
 COPY scripts/patch-AC2855.php scripts/patch-AC2855.php
 COPY templates/memory-limit-php.ini /usr/local/etc/php/conf.d/memory-limit-php.ini
 
+COPY Test/composer.json extensions/MichielGerritsen-ExampleTest/
+COPY Test/ExampleTest.php extensions/MichielGerritsen-ExampleTest/Test/Integration/
+
 RUN set -e; \
     ./start-services && \
     composer self-update --2 && \
@@ -79,6 +82,9 @@ RUN set -e; \
     rm scripts/apply-2.4-patches.php && \
     rm scripts/downgrade-monolog.php && \
     rm scripts/fix-monolog.php && \
+    composer require michielgerritsen/exampletest:@dev && \
+    cd /data/dev/tests/integration/ && ../../../vendor/bin/phpunit /data/vendor/michielgerritsen/exampletest/Test/Integration/ExampleTest.php && \
+    cd /data && \
     ./stop-services
 
 COPY templates/install-config-mysql.php dev/tests/integration/etc/
