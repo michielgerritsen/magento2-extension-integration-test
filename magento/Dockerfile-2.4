@@ -53,6 +53,7 @@ RUN set -e; \
     if [ "$MAGENTO_VERSION" = "2.4.4" ]; then composer require "magento/inventory-metapackage:1.2.4-p1 as 1.2.4" --no-update; fi && \
     echo "[cad] Running Composer install" && \
     ./retry "composer install" && \
+    jq ".replace[\"magento/magento2-functional-testing-framework\"] = \"*\"" composer.json > composer.tmp.json && mv composer.tmp.json composer.json && \
     ./retry "composer remove magento/magento2-functional-testing-framework" && \
     php scripts/patch-AC2855.php && \
     php scripts/downgrade-monolog.php && \
