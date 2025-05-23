@@ -93,6 +93,10 @@ jobs:
       if: github.ref == 'refs/heads/master' && matrix.cfg.SAMPLE_DATA == true
       run: docker push michielgerritsen/magento-project-community-edition:${{ matrix.cfg.PHP_VERSION }}-magento${{ matrix.cfg.MAGENTO_VERSION }}-sample-data
 
+    - name: Setup upterm session
+      if: failure()
+      uses: lhotari/action-upterm@v1
+
     - name: Dump Docker logs files (on failure)
       if: failure()
       run: |
