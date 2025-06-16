@@ -78,8 +78,14 @@ jobs:
         docker run --detach --name magento-project-community-edition
         michielgerritsen/magento-project-community-edition:${{ matrix.cfg.PHP_VERSION }}-magento${{ matrix.cfg.MAGENTO_VERSION }}-sample-data
 
+    - name: Copy EntityAbstract.php
+      run: docker cp magento/EntityAbstract.php magento-project-community-edition:/data/vendor/magento/framework/Code/Generator/EntityAbstract.php
+
     - name: Enable developer mode
       run: docker exec magento-project-community-edition ./retry "bin/magento deploy:mode:set developer"
+
+    - name: Copy EntityAbstract.php
+      run: docker cp magento/EntityAbstract.php magento-project-community-edition:/data/vendor/magento/framework/Code/Generator/EntityAbstract.php
 
     - name: Copy the example test module
       run: |
@@ -94,8 +100,14 @@ jobs:
     - name: Enable developer mode
       run: docker exec magento-project-community-edition ./retry "bin/magento deploy:mode:set developer"
 
+    - name: Copy EntityAbstract.php
+      run: docker cp magento/EntityAbstract.php magento-project-community-edition:/data/vendor/magento/framework/Code/Generator/EntityAbstract.php
+
     - name: Install the example test module
       run: docker exec magento-project-community-edition composer require michielgerritsen/exampletest:@dev
+
+    - name: Copy EntityAbstract.php
+      run: docker cp magento/EntityAbstract.php magento-project-community-edition:/data/vendor/magento/framework/Code/Generator/EntityAbstract.php
 
     - name: Debug
       continue-on-error: true
