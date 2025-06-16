@@ -91,6 +91,7 @@ RUN set -e; \
     cat /data/generated/code/Psr/Log/LoggerInterface/Proxy.php && \
     composer require michielgerritsen/exampletest:@dev && \
     cat /data/generated/code/Psr/Log/LoggerInterface/Proxy.php && \
+    php bin/magento cache:flush && \
     ./stop-services && \
     cat /data/generated/code/Psr/Log/LoggerInterface/Proxy.php
 
