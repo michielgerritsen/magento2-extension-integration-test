@@ -101,6 +101,9 @@ jobs:
       continue-on-error: true
       run: docker exec magento-project-community-edition cat /data/generated/code/Psr/Log/LoggerInterface/Proxy.php
 
+    - name: Copy EntityAbstract.php
+      run: docker cp magento/EntityAbstract.php magento-project-community-edition:/data/vendor/magento/framework/Code/Generator/EntityAbstract.php
+
     - name: Run setup:di:compile
       run: docker exec magento-project-community-edition ./retry "php bin/magento setup:di:compile"
 
@@ -109,7 +112,7 @@ jobs:
       run: docker exec magento-project-community-edition cat /data/generated/code/Psr/Log/LoggerInterface/Proxy.php
 
     - name: Run the example test
-      run: docker exec magento-project-community-edition ./run-integration-tests /data/vendor/michielgerritsen/exampletest/Test/Integration/ExampleTest.php
+      run: docker exec magento-project-community-edition bash -c "cd /data/dev/tests/integration/ && ../../../vendor/bin/phpunit /data/vendor/michielgerritsen/exampletest/Test/Integration/ExampleTest.php"
 
     # Step 3: Upload the images to Docker Hub.
     - name: Docker hub login
