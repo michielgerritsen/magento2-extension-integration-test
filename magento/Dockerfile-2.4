@@ -78,6 +78,7 @@ RUN set -e; \
     rm scripts/downgrade-monolog.php && \
     ./stop-services
 
+COPY templates/supervisord-webserver.conf /etc/supervisor/conf.d/webserver.conf
 COPY templates/install-config-mysql.php dev/tests/integration/etc/
 COPY templates/post-install-setup-command-config.php dev/tests/integration/etc/
 COPY templates/phpunit-unit.xml dev/tests/unit/phpunit.xml

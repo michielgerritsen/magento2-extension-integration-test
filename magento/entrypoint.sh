@@ -3,13 +3,6 @@
 # Comes from the parent image
 ./start-services
 
-nohup /usr/local/bin/php -S 0.0.0.0:80 -t /data/pub/ /data/phpserver/router.php &
-status=$?
-if [ $status -ne 0 ]; then
-  echo "Failed to start the php server: $status"
-  exit $status
-fi
-
 if [ -n "$URL" ] && [ "$URL" != "http://localhost/" ]; then
   echo "Updating Base URL"
   magerun2 config:store:set web/unsecure/base_url $URL
