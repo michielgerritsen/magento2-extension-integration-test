@@ -10,7 +10,12 @@ retries=0
 cmd=$1
 
 # Execute the command until it succeeds or the maximum number of retries is reached
-while ! eval $cmd 2>&1 | tee /dev/stderr && [ $retries -lt $max_retries ]; do
+while [ $retries -lt $max_retries ]; do
+  eval $cmd 2>&1 | tee /dev/stderr
+  exit_code=${PIPESTATUS[0]}
+  if [ $exit_code -eq 0 ]; then
+    break
+  fi
   echo "Command failed. Retry attempt $retries"
   retries=$((retries+1))
   sleep 1
