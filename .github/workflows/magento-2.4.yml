@@ -146,7 +146,7 @@ jobs:
     - name: Dump Docker logs files (on failure)
       if: failure()
       run: |
-        mkdir failure-logs
+        mkdir -p failure-logs/var/log
         docker logs magento-project-community-edition > failure-logs/docker.log
         docker cp magento-project-community-edition:/data/var/log failure-logs/var/log
         mkdir xdebug-logs
