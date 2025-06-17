@@ -22,7 +22,6 @@ COPY scripts/remove-paypal-braintree.php scripts/remove-paypal-braintree.php
 COPY scripts/patch-AC2855.php scripts/patch-AC2855.php
 COPY scripts/run-integration-tests run-integration-tests
 COPY templates/memory-limit-php.ini /usr/local/etc/php/conf.d/memory-limit-php.ini
-COPY xdebug-trace.ini /usr/local/etc/php/conf.d/xdebug-trace.ini
 
 COPY Test/composer.json extensions/MichielGerritsen-ExampleTest/composer.json
 COPY Test/ExampleTest.php extensions/MichielGerritsen-ExampleTest/Test/Integration/ExampleTest.php
@@ -102,6 +101,7 @@ RUN set -e; \
     ./stop-services && \
     cat /data/generated/code/Psr/Log/LoggerInterface/Proxy.php
 
+COPY xdebug-trace.ini /usr/local/etc/php/conf.d/xdebug-trace.ini
 COPY templates/install-config-mysql.php dev/tests/integration/etc/
 COPY templates/post-install-setup-command-config.php dev/tests/integration/etc/
 COPY templates/phpunit-unit.xml dev/tests/unit/phpunit.xml
