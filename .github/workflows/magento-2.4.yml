@@ -150,8 +150,7 @@ jobs:
         docker logs magento-project-community-edition > failure-logs/docker.log
         docker cp magento-project-community-edition:/data/var/log failure-logs/var/log
         mkdir xdebug-logs
-        docker logs magento-project-community-edition > failure-logs/docker.log
-        docker cp magento-project-community-edition:/tmp/xdebug-trace/ xdebug-logs
+        docker cp magento-project-community-edition:/tmp/xdebug-trace/ xdebug-logs/
 
     - name: Upload failure artifacts
       if: failure()
