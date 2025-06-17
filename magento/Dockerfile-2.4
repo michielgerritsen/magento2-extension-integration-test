@@ -29,6 +29,7 @@ COPY Test/ExampleTest.php extensions/MichielGerritsen-ExampleTest/Test/Integrati
 
 RUN set -e; \
     pecl install xdebug && \
+    docker-php-ext-enable xdebug \
     php -i |grep xdebug && \
     php -i |grep opcache && \
     ./start-services && \
