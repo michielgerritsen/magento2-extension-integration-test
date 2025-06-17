@@ -27,9 +27,6 @@ COPY Test/composer.json extensions/MichielGerritsen-ExampleTest/composer.json
 COPY Test/ExampleTest.php extensions/MichielGerritsen-ExampleTest/Test/Integration/ExampleTest.php
 
 RUN set -e; \
-    pecl install xdebug && \
-    docker-php-ext-enable xdebug.so && \
-    mkdir -p /data/var/log/xdebug-trace && \
     php -i |grep xdebug && \
     php -i |grep opcache && \
     ./start-services && \
