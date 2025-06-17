@@ -92,6 +92,7 @@ RUN set -e; \
     composer require michielgerritsen/exampletest:@dev && \
     cat /data/generated/code/Psr/Log/LoggerInterface/Proxy.php && \
     php bin/magento cache:flush && \
+    php -r "opcache_reset();" && \
     ./stop-services && \
     cat /data/generated/code/Psr/Log/LoggerInterface/Proxy.php
 
