@@ -74,7 +74,7 @@ jobs:
       if: matrix.cfg.SAMPLE_DATA == false
       run:
         docker build magento -f magento/Dockerfile-2.3
-        -t michielgerritsen/magento-project-community-edition:${{ matrix.cfg.PHP_VERSION }}-magento${{ matrix.cfg.MAGENTO_VERSION }}
+        -t michielgerritsen/magento-project-community-edition:${{ matrix.cfg.PHP_VERSION }}-magento${{ matrix.cfg.MAGENTO_VERSION }}-debug
         --build-arg MAGENTO_VERSION=${{ matrix.cfg.MAGENTO_VERSION }}
         --build-arg PHP_VERSION=${{ matrix.cfg.PHP_VERSION }}
 
@@ -82,7 +82,7 @@ jobs:
       if: matrix.cfg.SAMPLE_DATA == true
       run:
         docker build magento -f magento/Dockerfile-2.3
-        -t michielgerritsen/magento-project-community-edition:${{ matrix.cfg.PHP_VERSION }}-magento${{ matrix.cfg.MAGENTO_VERSION }}-sample-data
+        -t michielgerritsen/magento-project-community-edition:${{ matrix.cfg.PHP_VERSION }}-magento${{ matrix.cfg.MAGENTO_VERSION }}-sample-data-debug
         --build-arg MAGENTO_VERSION=${{ matrix.cfg.MAGENTO_VERSION }}
         --build-arg PHP_VERSION=${{ matrix.cfg.PHP_VERSION }}
         --build-arg SAMPLE_DATA=true
@@ -123,16 +123,16 @@ jobs:
 
     # Step 3: Upload the images to Docker Hub.
     - name: Docker hub login
-      if: github.ref == 'refs/heads/master'
+      if: github.ref == 'refs/heads/debug-new'
       run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
     - name: Push the image to Docker hub (without sample data)
-      if: github.ref == 'refs/heads/master' && matrix.cfg.SAMPLE_DATA == false
-      run: docker push michielgerritsen/magento-project-community-edition:${{ matrix.cfg.PHP_VERSION }}-magento${{ matrix.cfg.MAGENTO_VERSION }}
+      if: github.ref == 'refs/heads/debug-new' && matrix.cfg.SAMPLE_DATA == false
+      run: docker push michielgerritsen/magento-project-community-edition:${{ matrix.cfg.PHP_VERSION }}-magento${{ matrix.cfg.MAGENTO_VERSION }}-debug
 
     - name: Push the image to Docker hub (with sample data)
-      if: github.ref == 'refs/heads/master' && matrix.cfg.SAMPLE_DATA == true
-      run: docker push michielgerritsen/magento-project-community-edition:${{ matrix.cfg.PHP_VERSION }}-magento${{ matrix.cfg.MAGENTO_VERSION }}-sample-data
+      if: github.ref == 'refs/heads/debug-new' && matrix.cfg.SAMPLE_DATA == true
+      run: docker push michielgerritsen/magento-project-community-edition:${{ matrix.cfg.PHP_VERSION }}-magento${{ matrix.cfg.MAGENTO_VERSION }}-sample-data-debug
 
     - name: Dump Docker logs files (on failure)
       if: failure()
