@@ -91,9 +91,11 @@ COPY scripts/disable-2fa disable-2fa
 
 COPY templates/phpunit-integration.xml dev/tests/integration/phpunit.xml
 COPY templates/phpunit-integration-248.xml dev/tests/integration/phpunit-248.xml
+COPY scripts/fix-phpunit.xml.php fix-phpunit.xml.php
 
 RUN chmod +x enable-flat-catalog && chmod +x change-base-url && \
-    if [ "$MAGENTO_VERSION" = "2.4.8" ]; then cp dev/tests/integration/phpunit-248.xml dev/tests/integration/phpunit.xml; fi && \
+    php fix-phpunit.xml.php && \
+    rm fix-phpunit.xml.php && \
     rm dev/tests/integration/phpunit-248.xml
 
 ENTRYPOINT ["/bin/bash", "entrypoint.sh"]
