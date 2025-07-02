@@ -18,6 +18,8 @@
 
 namespace MichielGerritsen\ExampleTest\Test\Integration;
 
+use Magento\Framework\App\Config\ScopeConfigInterface;
+
 class ExampleTest extends \PHPUnit\Framework\TestCase
 {
     /**
@@ -26,5 +28,18 @@ class ExampleTest extends \PHPUnit\Framework\TestCase
     public function testSuccess()
     {
         $this->assertTrue(true);
+    }
+
+    /**
+     * @magentoConfigFixture current_store general/store_information/name Magento 2 test store
+     */
+    public function testCanUseConfigFixture(): void
+    {
+        $result = $this->objectManager->get(ScopeConfigInterface::class)->getValue(
+            'general/store_information/name',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+
+        $this->assertEquals('Magento 2 test store', $result);
     }
 }
