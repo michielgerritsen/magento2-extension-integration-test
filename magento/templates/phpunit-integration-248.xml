@@ -53,6 +53,7 @@
         <!--<const name="RABBITMQ_MANAGEMENT_PORT" value="15672"/>-->
         <!--<const name="RABBITMQ_VIRTUALHOST" value="/"/>-->
         <!--<const name="TESTS_PARALLEL_RUN" value="1"/>-->
+        <const name="USE_OVERRIDE_CONFIG" value="enabled"/>
     </php>
     <extensions>
         <bootstrap class="Magento\TestFramework\Event\Subscribers"/>
