@@ -19,6 +19,7 @@
 namespace MichielGerritsen\ExampleTest\Test\Integration;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\TestFramework\ObjectManager;
 
 class ExampleTest extends \PHPUnit\Framework\TestCase
 {
@@ -35,7 +36,7 @@ class ExampleTest extends \PHPUnit\Framework\TestCase
      */
     public function testCanUseConfigFixture(): void
     {
-        $result = $this->objectManager->get(ScopeConfigInterface::class)->getValue(
+        $result = ObjectManager::getInstance()->get(ScopeConfigInterface::class)->getValue(
             'general/store_information/name',
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
