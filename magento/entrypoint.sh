@@ -21,15 +21,7 @@ if [ -f custom-entrypoint.sh ]; then
   bash ./custom-entrypoint.sh
 fi
 
-# Wait until Elasticsearch is up and running
-counter=0
-until curl -s -o /dev/null http://localhost:9200; do
-  counter=$((counter + 1))
-  echo "Elasticsearch not (yet) available, waiting... (attempt $counter)"
-  sleep 1
-done
-
-if [ -n "$FLAT_TABLES" ]; then
+if [ "$FLAT_TABLES" = "true" ]; then
   echo "Enabling Flat Tables"
   magerun2 config:store:set catalog/frontend/flat_catalog_category 1
   magerun2 config:store:set catalog/frontend/flat_catalog_product 1
