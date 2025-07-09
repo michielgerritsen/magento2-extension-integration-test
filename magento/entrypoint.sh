@@ -30,9 +30,8 @@ if [ "$FLAT_TABLES" = "true" ]; then
 fi
 
 if [ "$DISABLE_2FA" = "true" ] && grep -q Magento_TwoFactorAuth "app/etc/config.php"; then
-    echo "Disabling Two Factor Authentication"
-    php bin/magento module:disable Magento_TwoFactorAuth -f
-  fi
+  echo "Disabling Two Factor Authentication"
+  php bin/magento module:disable Magento_TwoFactorAuth -f
 fi
 
 while sleep 5; do
