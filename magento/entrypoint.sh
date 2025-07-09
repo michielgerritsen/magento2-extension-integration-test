@@ -29,6 +29,12 @@ if [ "$FLAT_TABLES" = "true" ]; then
   php bin/magento indexer:reindex
 fi
 
+if [ "$DISABLE_2FA" = "true" ] && grep -q Magento_TwoFactorAuth "app/etc/config.php"; then
+    echo "Disabling Two Factor Authentication"
+    php bin/magento module:disable Magento_TwoFactorAuth -f
+  fi
+fi
+
 while sleep 5; do
   ps aux |grep elasticsearch |grep -q -v grep
   ELASTICSEARCH_STATUS=$?
