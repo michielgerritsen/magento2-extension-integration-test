@@ -9,5 +9,7 @@ if (!$is248 && !$is249) {
 }
 
 copy('dev/tests/integration/phpunit-248.xml', 'dev/tests/integration/phpunit.xml');
+copy('dev/tests/unit/phpunit-248.xml', 'dev/tests/unit/phpunit.xml');
 
 echo 'Copied dev/tests/integration/phpunit-248.xml to dev/tests/integration/phpunit.xml' . PHP_EOL;
+echo 'Copied dev/tests/unit/phpunit-248.xml to dev/tests/unit/phpunit.xml' . PHP_EOL;
