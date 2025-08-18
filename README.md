@@ -81,6 +81,8 @@ Special thanks to Fooman for providing a Magento 2 mirror that does not requires
 
 | Magento version | PHP 8.4 | PHP 8.3 | PHP 8.2 | PHP 8.1 | PHP 7.4 | PHP 7.3 | PHP 7.2 |
 |-----------------|---------|---------|---------|---------|---------|---------|---------|
+| 2.4.9-alpha2    | x       | x       | -       | -       | -       | -       | -       |
+| 2.4.8-p2        | x       | x       | -       | -       | -       | -       | -       |
 | 2.4.8-p1        | x       | x       | -       | -       | -       | -       | -       |
 | 2.4.8           | x       | x       | -       | -       | -       | -       | -       |
 | 2.4.7-p6        | -       | x       | x       | -       | -       | -       | -       |
