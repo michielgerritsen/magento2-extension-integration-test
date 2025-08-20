@@ -21,7 +21,7 @@ namespace MichielGerritsen\ExampleTest\Test\Integration;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\TestFramework\ObjectManager;
 
-class ExampleTest extends \PHPUnit\Framework\TestCase
+class ExampleIntegrationTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * The only goal of this test is to check if test can be run successful.

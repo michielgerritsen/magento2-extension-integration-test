@@ -266,14 +266,16 @@ jobs:
         docker run --detach --name magento-project-community-edition
         michielgerritsen/magento-project-community-edition:${{ matrix.cfg.PHP_VERSION }}-magento${{ matrix.cfg.MAGENTO_VERSION }}-sample-data
 
-    - name: Create the dummy test directory
-      run: docker exec magento-project-community-edition mkdir -p /data/app/code/MichielGerritsen/Magento2ExtensionIntegrationTest/Test/Integration
-
     - name: Copy the example test module
       run: |
-        docker exec magento-project-community-edition mkdir -p /data/extensions/MichielGerritsen-ExampleTest/Test/Integration/
+        docker exec magento-project-community-edition mkdir -vp /data/extensions/MichielGerritsen-ExampleTest/Test/Integration/
+        docker exec magento-project-community-edition mkdir -vp /data/extensions/MichielGerritsen-ExampleTest/Test/Unit/
+        echo "Copying Test/composer.json"
         docker cp Test/composer.json magento-project-community-edition:/data/extensions/MichielGerritsen-ExampleTest/
-        docker cp Test/ExampleTest.php magento-project-community-edition:/data/extensions/MichielGerritsen-ExampleTest/Test/Integration/
+        echo "Copying Test/ExampleIntegrationTest.php"
+        docker cp Test/ExampleIntegrationTest.php magento-project-community-edition:/data/extensions/MichielGerritsen-ExampleTest/Test/Integration/
+        echo "Copying Test/ExampleUnitTest.php"
+        docker cp Test/ExampleUnitTest.php magento-project-community-edition:/data/extensions/MichielGerritsen-ExampleTest/Test/Unit/
 
     - name: Install the example test module
       run: docker exec magento-project-community-edition composer require michielgerritsen/exampletest:@dev
@@ -284,8 +286,11 @@ jobs:
     - name: Run setup:di:compile
       run: docker exec magento-project-community-edition ./retry "php bin/magento setup:di:compile"
 
-    - name: Run the example test
-      run: docker exec magento-project-community-edition bash -c "cd /data/dev/tests/integration/ && ../../../vendor/bin/phpunit /data/vendor/michielgerritsen/exampletest/Test/Integration/ExampleTest.php"
+    - name: Run the example integration test
+      run: docker exec magento-project-community-edition bash -c "cd /data/dev/tests/integration/ && ../../../vendor/bin/phpunit /data/vendor/michielgerritsen/exampletest/Test/Integration/ExampleIntegrationTest.php"
+
+    - name: Run the example unit test
+      run: docker exec magento-project-community-edition bash -c "cd /data/dev/tests/unit/ && ../../../vendor/bin/phpunit /data/vendor/michielgerritsen/exampletest/Test/Unit/ExampleUnitTest.php"
 
     # Step 3: Upload the images to Docker Hub.
     - name: Docker hub login
