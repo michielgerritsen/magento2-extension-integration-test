@@ -85,6 +85,7 @@ Special thanks to Fooman for providing a Magento 2 mirror that does not requires
 | 2.4.8-p2        | x       | x       | -       | -       | -       | -       | -       |
 | 2.4.8-p1        | x       | x       | -       | -       | -       | -       | -       |
 | 2.4.8           | x       | x       | -       | -       | -       | -       | -       |
+| 2.4.7-p7        | -       | x       | x       | -       | -       | -       | -       |
 | 2.4.7-p6        | -       | x       | x       | -       | -       | -       | -       |
 | 2.4.7-p5        | -       | x       | x       | -       | -       | -       | -       |
 | 2.4.7-p4        | -       | x       | x       | -       | -       | -       | -       |
@@ -92,6 +93,7 @@ Special thanks to Fooman for providing a Magento 2 mirror that does not requires
 | 2.4.7-p2        | -       | x       | x       | -       | -       | -       | -       |
 | 2.4.7-p1        | -       | x       | x       | -       | -       | -       | -       |
 | 2.4.7           | -       | x       | x       | -       | -       | -       | -       |
+| 2.4.6-p12       | -       | -       | x       | x       | -       | -       | -       |
 | 2.4.6-p11       | -       | -       | x       | x       | -       | -       | -       |
 | 2.4.6-p10       | -       | -       | x       | x       | -       | -       | -       |
 | 2.4.6-p9        | -       | -       | x       | x       | -       | -       | -       |
@@ -104,6 +106,7 @@ Special thanks to Fooman for providing a Magento 2 mirror that does not requires
 | 2.4.6-p2        | -       | -       | -       | -       | -       | -       | -       |
 | 2.4.6-p1        | -       | -       | x       | x       | -       | -       | -       |
 | 2.4.6           | -       | -       | x       | x       | -       | -       | -       |
+| 2.4.5-p14       | -       | -       | -       | x       | -       | -       | -       |
 | 2.4.5-p13       | -       | -       | -       | x       | -       | -       | -       |
 | 2.4.5-p12       | -       | -       | -       | x       | -       | -       | -       |
 | 2.4.5-p11       | -       | -       | -       | x       | -       | -       | -       |
