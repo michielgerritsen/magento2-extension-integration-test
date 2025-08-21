@@ -119,7 +119,7 @@ jobs:
       run: docker exec magento-project-community-edition ./retry "php bin/magento setup:di:compile"
 
     - name: Run the example test
-      run: docker exec magento-project-community-edition bash -c "cd /data/dev/tests/integration/ && ../../../vendor/bin/phpunit /data/vendor/michielgerritsen/exampletest/Test/Integration/ExampleIntegrationTest.php"
+      run: docker exec magento-project-community-edition bash -c "cd /data/dev/tests/integration/ && ../../../vendor/bin/phpunit /data/vendor/michielgerritsen/exampletest/Test/Integration/ExampleTest.php"
 
     # Step 3: Upload the images to Docker Hub.
     - name: Docker hub login
