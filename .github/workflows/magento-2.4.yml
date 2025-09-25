@@ -1,6 +1,8 @@
 name: Magento 2.4 Community Edition Docker container build
 on:
   push:
+    branches:
+      - '!mage-os'
   pull_request:
   schedule:
     - cron: '0 0 * * 1'
