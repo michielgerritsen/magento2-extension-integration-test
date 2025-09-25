@@ -53,24 +53,19 @@ jobs:
       if: matrix.cfg.SAMPLE_DATA == false
       run:
         docker run --memory=4G --detach --name mage-os-community-edition
-        michielgerritsen/mage-os-community-edition:${{ matrix.cfg.PHP_VERSION }}-mage-os{{ matrix.cfg.MAGEOS_VERSION }}
+        michielgerritsen/mage-os-community-edition:${{ matrix.cfg.PHP_VERSION }}-mage-os${{ matrix.cfg.MAGEOS_VERSION }}
 
     - name: Start the docker image (with sample date)
       if: matrix.cfg.SAMPLE_DATA == true
       run:
         docker run --detach --name mage-os-community-edition
-        michielgerritsen/mage-os-community-edition:${{ matrix.cfg.PHP_VERSION }}-mage-os{{ matrix.cfg.MAGEOS_VERSION }}-sample-data
+        michielgerritsen/mage-os-community-edition:${{ matrix.cfg.PHP_VERSION }}-mage-os${{ matrix.cfg.MAGEOS_VERSION }}-sample-data
 
     - name: Copy the example test module
       run: |
-        docker exec mage-os-community-edition mkdir -vp /data/extensions/MichielGerritsen-ExampleTest/Test/Integration/
-        docker exec mage-os-community-edition mkdir -vp /data/extensions/MichielGerritsen-ExampleTest/Test/Unit/
-        echo "Copying Test/composer.json"
+        docker exec mage-os-community-edition mkdir -p /data/extensions/MichielGerritsen-ExampleTest/Test/Integration/
         docker cp Test/composer.json mage-os-community-edition:/data/extensions/MichielGerritsen-ExampleTest/
-        echo "Copying Test/ExampleIntegrationTest.php"
-        docker cp Test/ExampleIntegrationTest.php mage-os-community-edition:/data/extensions/MichielGerritsen-ExampleTest/Test/Integration/
-        echo "Copying Test/ExampleUnitTest.php"
-        docker cp Test/ExampleUnitTest.php mage-os-community-edition:/data/extensions/MichielGerritsen-ExampleTest/Test/Unit/
+        docker cp Test/ExampleTest.php mage-os-community-edition:/data/extensions/MichielGerritsen-ExampleTest/Test/Integration/
 
     - name: Install the example test module
       run: docker exec mage-os-community-edition composer require michielgerritsen/exampletest:@dev
@@ -81,11 +76,8 @@ jobs:
     - name: Run setup:di:compile
       run: docker exec mage-os-community-edition ./retry "php bin/magento setup:di:compile"
 
-    - name: Run the example integration test
-      run: docker exec mage-os-community-edition bash -c "cd /data/dev/tests/integration/ && ../../../vendor/bin/phpunit /data/vendor/michielgerritsen/exampletest/Test/Integration/ExampleIntegrationTest.php"
-
-    - name: Run the example unit test
-      run: docker exec mage-os-community-edition bash -c "cd /data/dev/tests/unit/ && ../../../vendor/bin/phpunit /data/vendor/michielgerritsen/exampletest/Test/Unit/ExampleUnitTest.php"
+    - name: Install the example test module
+      run: docker exec mage-os-community-edition composer require michielgerritsen/exampletest:@dev
 
     # Step 3: Upload the images to Docker Hub.
     - name: Docker hub login
@@ -94,11 +86,11 @@ jobs:
 
     - name: Push the image to Docker hub (without sample data)
       if: github.ref == 'refs/heads/master' && matrix.cfg.SAMPLE_DATA == false
-      run: docker push michielgerritsen/mage-os-community-edition:${{ matrix.cfg.PHP_VERSION }}-mage-os{{ matrix.cfg.MAGEOS_VERSION }}
+      run: docker push michielgerritsen/mage-os-community-edition:${{ matrix.cfg.PHP_VERSION }}-mage-os${{ matrix.cfg.MAGEOS_VERSION }}
 
     - name: Push the image to Docker hub (with sample data)
       if: github.ref == 'refs/heads/master' && matrix.cfg.SAMPLE_DATA == true
-      run: docker push michielgerritsen/mage-os-community-edition:${{ matrix.cfg.PHP_VERSION }}-mage-os{{ matrix.cfg.MAGEOS_VERSION }}-sample-data
+      run: docker push michielgerritsen/mage-os-community-edition:${{ matrix.cfg.PHP_VERSION }}-mage-os${{ matrix.cfg.MAGEOS_VERSION }}-sample-data
 
     - name: Dump Docker logs files (on failure)
       if: failure()
@@ -111,6 +103,6 @@ jobs:
       if: failure()
       uses: actions/upload-artifact@v4
       with:
-        name: failure-artifacts-${{ matrix.cfg.PHP_VERSION }}-mage-os{{ matrix.cfg.MAGEOS_VERSION }}
+        name: failure-artifacts-${{ matrix.cfg.PHP_VERSION }}-mage-os${{ matrix.cfg.MAGEOS_VERSION }}
         path: |
           failure-logs
