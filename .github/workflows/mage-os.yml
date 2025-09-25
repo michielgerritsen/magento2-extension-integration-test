@@ -1,4 +1,4 @@
-name: Magento 2.4 Community Edition Docker container build
+name: Mage-OS Build
 on:
   push:
   pull_request:

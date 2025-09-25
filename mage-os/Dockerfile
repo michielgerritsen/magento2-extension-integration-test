@@ -4,8 +4,6 @@ FROM michielgerritsen/magento2-base-image:${PHP_VERSION}
 ARG MAGEOS_VERSION=2.4.4
 ARG MAGEOS_TYPE=project-community-edition
 ARG SAMPLE_DATA=false
-ARG DISABLE_2FA=true
-ARG COMPOSER_AUTH={}
 
 ENV CI=true
 ENV URL=http://localhost/
