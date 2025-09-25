@@ -1,0 +1,21 @@
+#!/bin/bash
+
+MAX_RETRIES=5
+COUNT=0
+
+while true; do
+    eval "$1"
+    EXIT_CODE=$?
+    if [ $EXIT_CODE -eq 0 ]; then
+        exit 0
+    fi
+
+    COUNT=$((COUNT + 1))
+    if [ $COUNT -ge $MAX_RETRIES ]; then
+        echo "Command failed after $MAX_RETRIES attempts."
+        exit $EXIT_CODE
+    fi
+
+    echo "Retry $COUNT/$MAX_RETRIES failed. Retrying..."
+    sleep 1
+done

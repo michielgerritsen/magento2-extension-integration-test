@@ -1,0 +1,7 @@
+#!/bin/bash
+
+if grep -q Magento_TwoFactorAuth "app/etc/config.php"; then
+  ./retry "php bin/magento module:disable Magento_TwoFactorAuth -f"
+else
+  echo "Magento_TwoFactorAuth is not installed"
+fi
