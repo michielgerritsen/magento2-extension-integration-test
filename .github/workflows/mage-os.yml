@@ -35,7 +35,7 @@ jobs:
       if: matrix.cfg.SAMPLE_DATA == false
       run:
         docker build mage-os -f mage-os/Dockerfile
-        -t michielgerritsen/mage-os-community-edition:${{ matrix.cfg.PHP_VERSION }}-mage-os{{ matrix.cfg.MAGEOS_VERSION }}
+        -t michielgerritsen/mage-os-community-edition:${{ matrix.cfg.PHP_VERSION }}-mage-os${{ matrix.cfg.MAGEOS_VERSION }}
         --build-arg MAGEOS_VERSION=${{ matrix.cfg.MAGEOS_VERSION }}
         --build-arg PHP_VERSION=${{ matrix.cfg.PHP_VERSION }}
 
@@ -43,7 +43,7 @@ jobs:
       if: matrix.cfg.SAMPLE_DATA == true
       run:
         docker build mage-os -f mage-os/Dockerfile
-        -t michielgerritsen/mage-os-community-edition:${{ matrix.cfg.PHP_VERSION }}-mage-os{{ matrix.cfg.MAGEOS_VERSION }}-sample-data
+        -t michielgerritsen/mage-os-community-edition:${{ matrix.cfg.PHP_VERSION }}-mage-os${{ matrix.cfg.MAGEOS_VERSION }}-sample-data
         --build-arg MAGEOS_VERSION=${{ matrix.cfg.MAGEOS_VERSION }}
         --build-arg PHP_VERSION=${{ matrix.cfg.PHP_VERSION }}
         --build-arg SAMPLE_DATA=true
