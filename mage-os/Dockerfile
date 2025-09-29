@@ -25,10 +25,6 @@ RUN set -e; \
     echo "[cad] Allowing composer plugins" && \
     php scripts/allow-composer-plugins.php && \
     rm scripts/allow-composer-plugins.php && \
-    if [ "$MAGEOS_VERSION" != "alpha2" ]; then \
-        composer config --unset repositories.0 && \
-        composer config repositories.fooman composer https://repo-magento-mirror.fooman.co.nz/; \
-    fi && \
     echo "[cad] Updating XML" && \
     if [ -f "/data/vendor/magento/module-inventory-catalog/etc/communication.xml" ]; then sed -i 's/is_synchronous="false"//g' /data/vendor/magento/module-inventory-catalog/etc/communication.xml; fi && \
     if [ -f "/data/vendor/magento/module-inventory-sales/etc/communication.xml" ]; then sed -i 's/is_synchronous="false"//g' /data/vendor/magento/module-inventory-sales/etc/communication.xml; fi && \
