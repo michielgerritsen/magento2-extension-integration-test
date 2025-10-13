@@ -77,6 +77,7 @@ RUN set -e; \
     php scripts/apply-2.4-patches.php && \
     rm scripts/apply-2.4-patches.php && \
     rm scripts/downgrade-monolog.php && \
+    git config --global --add safe.directory '*' && \
     ./stop-services
 
 COPY templates/supervisord-webserver.conf /etc/supervisor/conf.d/webserver.conf

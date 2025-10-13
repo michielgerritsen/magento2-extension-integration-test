@@ -65,6 +65,7 @@ RUN ./start-services && \
     composer config repositories.dev-extensions path extensions/* && \
     php scripts/install-phpstan.php && \
     rm scripts/install-phpstan.php && \
+    git config --global --add safe.directory '*' && \
     ./stop-services
 
 COPY templates/supervisord-webserver.conf /etc/supervisor/conf.d/webserver.conf
