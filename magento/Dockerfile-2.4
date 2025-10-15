@@ -27,7 +27,7 @@ RUN set -e; \
     composer self-update --2 && \
     echo "[cad] Composer version:" && \
     composer --version && \
-    if [ "$MAGENTO_VERSION" = "2.4.9-alpha2" ]; then \
+    if [ "$MAGENTO_VERSION" = "2.4.9-alpha3" ]; then \
         echo "[cad] Downloading Magento" && \
         composer create-project --repository-url=https://repo.magento.com/ magento/$MAGENTO_TYPE=$MAGENTO_VERSION build && \
         mv build/* . && \
@@ -45,7 +45,7 @@ RUN set -e; \
     echo "[cad] Upgrading to composer 2" && \
     php scripts/upgrade-to-composer-2.php && \
     rm scripts/upgrade-to-composer-2.php && \
-    if [ "$MAGENTO_VERSION" != "2.4.9-alpha2" ]; then \
+    if [ "$MAGENTO_VERSION" != "2.4.9-alpha3" ]; then \
         composer config --unset repositories.0 && \
         composer config repositories.fooman composer https://repo-magento-mirror.fooman.co.nz/; \
     fi && \
@@ -65,8 +65,8 @@ RUN set -e; \
     php bin/magento setup:install --backend-frontname=admin --session-save=db --db-host=127.0.0.1 --db-name=magento --db-user=magento --db-password=password --base-url=http://localhost --timezone=Europe/Amsterdam --currency=EUR --admin-user=exampleuser --admin-password=examplepassword123 --admin-email=user@example.com --admin-firstname=Example --admin-lastname=Example --use-rewrites=1 --use-sample-data && \
     echo "[cad] Setting developer mode" && \
     php bin/magento deploy:mode:set developer && \
-    if [ "${SAMPLE_DATA}" = "true" ] && [ "$MAGENTO_VERSION" != "2.4.9-alpha2" ]; then echo "[cad] Running php bin/magento sampledata:deploy"; php bin/magento sampledata:deploy; fi && \
-    if [ "${SAMPLE_DATA}" = "true" ] && [ "$MAGENTO_VERSION" = "2.4.9-alpha2" ]; then echo "[cad] Installing sampledata"; composer require magento/module-bundle-sample-data magento/module-catalog-sample-data magento/module-sales-sample-data magento/module-customer-sample-data magento/module-cms-sample-data magento/module-widget-sample-data magento/module-theme-sample-data magento/module-downloadable-sample-data magento/module-wishlist-sample-data magento/module-review-sample-data magento/module-tax-sample-data magento/module-catalog-rule-sample-data magento/module-configurable-sample-data magento/module-product-links-sample-data magento/module-sales-rule-sample-data magento/module-msrp-sample-data magento/module-grouped-product-sample-data magento/module-swatches-sample-data magento/module-offline-shipping-sample-data magento/sample-data-media --ignore-platform-reqs; fi && \
+    if [ "${SAMPLE_DATA}" = "true" ] && [ "$MAGENTO_VERSION" != "2.4.9-alpha3" ]; then echo "[cad] Running php bin/magento sampledata:deploy"; php bin/magento sampledata:deploy; fi && \
+    if [ "${SAMPLE_DATA}" = "true" ] && [ "$MAGENTO_VERSION" = "2.4.9-alpha3" ]; then echo "[cad] Installing sampledata"; composer require magento/module-bundle-sample-data magento/module-catalog-sample-data magento/module-sales-sample-data magento/module-customer-sample-data magento/module-cms-sample-data magento/module-widget-sample-data magento/module-theme-sample-data magento/module-downloadable-sample-data magento/module-wishlist-sample-data magento/module-review-sample-data magento/module-tax-sample-data magento/module-catalog-rule-sample-data magento/module-configurable-sample-data magento/module-product-links-sample-data magento/module-sales-rule-sample-data magento/module-msrp-sample-data magento/module-grouped-product-sample-data magento/module-swatches-sample-data magento/module-offline-shipping-sample-data magento/sample-data-media --ignore-platform-reqs; fi && \
     if [ "${SAMPLE_DATA}" = "true" ]; then echo "[cad] Running setup:upgrade" && ./retry "php bin/magento setup:upgrade"; fi && \
     php bin/magento setup:static-content:deploy en_US -f -j 12 && \
     php bin/magento setup:di:compile && \

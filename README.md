@@ -81,10 +81,12 @@ Special thanks to Fooman for providing a Magento 2 mirror that does not requires
 
 | Magento version | PHP 8.4 | PHP 8.3 | PHP 8.2 | PHP 8.1 | PHP 7.4 | PHP 7.3 | PHP 7.2 |
 |-----------------|---------|---------|---------|---------|---------|---------|---------|
-| 2.4.9-alpha2    | x       | x       | -       | -       | -       | -       | -       |
+| 2.4.9-alpha3    | x       | x       | -       | -       | -       | -       | -       |
+| 2.4.8-p3        | x       | x       | -       | -       | -       | -       | -       |
 | 2.4.8-p2        | x       | x       | -       | -       | -       | -       | -       |
 | 2.4.8-p1        | x       | x       | -       | -       | -       | -       | -       |
 | 2.4.8           | x       | x       | -       | -       | -       | -       | -       |
+| 2.4.7-p8        | -       | x       | x       | -       | -       | -       | -       |
 | 2.4.7-p7        | -       | x       | x       | -       | -       | -       | -       |
 | 2.4.7-p6        | -       | x       | x       | -       | -       | -       | -       |
 | 2.4.7-p5        | -       | x       | x       | -       | -       | -       | -       |
@@ -93,6 +95,7 @@ Special thanks to Fooman for providing a Magento 2 mirror that does not requires
 | 2.4.7-p2        | -       | x       | x       | -       | -       | -       | -       |
 | 2.4.7-p1        | -       | x       | x       | -       | -       | -       | -       |
 | 2.4.7           | -       | x       | x       | -       | -       | -       | -       |
+| 2.4.6-p13       | -       | -       | x       | x       | -       | -       | -       |
 | 2.4.6-p12       | -       | -       | x       | x       | -       | -       | -       |
 | 2.4.6-p11       | -       | -       | x       | x       | -       | -       | -       |
 | 2.4.6-p10       | -       | -       | x       | x       | -       | -       | -       |
