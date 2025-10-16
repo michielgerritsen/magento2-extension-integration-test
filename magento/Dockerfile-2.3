@@ -25,7 +25,7 @@ RUN ./start-services && \
     echo "[cad] Composer version:" && \
     composer --version && \
     echo "[cad] Downloading & unzipping Magento" && \
-    curl -o magento.zip https://repo-magento-mirror.fooman.co.nz/dist/magento/$MAGENTO_TYPE/magento-$MAGENTO_TYPE-$MAGENTO_VERSION.zip && \
+    curl --fail-with-body -o magento.zip https://repo-magento-mirror.fooman.co.nz/dist/magento/$MAGENTO_TYPE/magento-$MAGENTO_TYPE-$MAGENTO_VERSION.zip && \
     unzip -q magento.zip -d . && \
     rm magento.zip && \
     echo "[cad] Allowing composer plugins" && \
