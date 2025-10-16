@@ -12,6 +12,10 @@ jobs:
       fail-fast: false
       matrix:
         cfg:
+          - { PHP_VERSION: php84-fpm, MAGEOS_VERSION: 2.0.0, SAMPLE_DATA: true }
+          - { PHP_VERSION: php84-fpm, MAGEOS_VERSION: 2.0.0, SAMPLE_DATA: false }
+          - { PHP_VERSION: php83-fpm, MAGEOS_VERSION: 2.0.0, SAMPLE_DATA: true }
+          - { PHP_VERSION: php83-fpm, MAGEOS_VERSION: 2.0.0, SAMPLE_DATA: false }
           - { PHP_VERSION: php83-fpm, MAGEOS_VERSION: 1.3.1, SAMPLE_DATA: true }
           - { PHP_VERSION: php83-fpm, MAGEOS_VERSION: 1.3.1, SAMPLE_DATA: false }
           - { PHP_VERSION: php83-fpm, MAGEOS_VERSION: 1.3.0, SAMPLE_DATA: true }
