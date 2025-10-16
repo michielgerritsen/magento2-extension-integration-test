@@ -1,7 +1,7 @@
-ARG PHP_VERSION=php74-fpm
+ARG PHP_VERSION=php82-fpm
 FROM michielgerritsen/magento2-base-image:${PHP_VERSION}
 
-ARG MAGENTO_VERSION=2.4.3
+ARG MAGENTO_VERSION=2.4.6
 ARG MAGENTO_TYPE=project-community-edition
 
 ENV CI=true
@@ -14,21 +14,29 @@ COPY scripts/apply-2.4-patches.php scripts/apply-2.4-patches.php
 COPY scripts/allow-composer-plugins.php scripts/allow-composer-plugins.php
 COPY templates/memory-limit-php.ini /usr/local/etc/php/conf.d/memory-limit-php.ini
 
-# Comes from Github Actions
-COPY vendor /data/vendor
-
-RUN curl -o magento.zip https://repo-magento-mirror.fooman.co.nz/dist/magento/$MAGENTO_TYPE/magento-$MAGENTO_TYPE-$MAGENTO_VERSION.zip && \
+RUN set -e; \
+    ./start-services && \
+    echo "[cad] Composer version:" && \
+    composer --version && \
+    echo "[cad] Downloading & unzipping Magento" && \
+    curl --fail-with-body -o magento.zip https://repo-magento-mirror.fooman.co.nz/dist/magento/$MAGENTO_TYPE/magento-$MAGENTO_TYPE-$MAGENTO_VERSION.zip && \
     unzip -q magento.zip -d . && \
-    rm magento.zip
-
-COPY templates/magento-2.4.3-composer-with-replacements.json composer.json
-
-RUN ./start-services && \
-    php scripts/allow-composer-plugins.php && rm scripts/allow-composer-plugins.php && \
+    rm magento.zip && \
+    echo "[cad] Allowing composer plugins" && \
+    php scripts/allow-composer-plugins.php && \
+    rm scripts/allow-composer-plugins.php && \
+    composer config --unset repositories.0 && \
+    composer config repositories.fooman composer https://repo-magento-mirror.fooman.co.nz/ && \
     ./retry "composer install" && \
+    composer config --no-plugins allow-plugins.yireo/magento2-replace-tools true && \
+    ./retry "composer require --dev yireo/magento2-replace-tools --with-dependencies" && \
+    ./retry "composer replace:bulk:add yireo/magento2-replace-all" && \
+    ./retry "composer replace:build" && \
+    ./retry "composer update --lock" && \
     if [ -f "/data/vendor/magento/module-inventory-catalog/etc/communication.xml" ]; then sed -i 's/is_synchronous="false"//g' /data/vendor/magento/module-inventory-catalog/etc/communication.xml; fi && \
     if [ -f "/data/vendor/magento/module-inventory-sales/etc/communication.xml" ]; then sed -i 's/is_synchronous="false"//g' /data/vendor/magento/module-inventory-sales/etc/communication.xml; fi && \
     if [ -f "/data/vendor/magento/module-inventory-indexer/etc/communication.xml" ]; then sed -i 's/is_synchronous="false"//g' /data/vendor/magento/module-inventory-indexer/etc/communication.xml; fi && \
+    echo "[cad] Running Magento setup:install" && \
     php bin/magento setup:install --backend-frontname=admin --session-save=db --db-host=127.0.0.1 --db-name=magento --db-user=magento --db-password=password --base-url=http://localhost --timezone=Europe/Amsterdam --currency=EUR --admin-user=exampleuser --admin-password=examplepassword123 --admin-email=user@example.com --admin-firstname=Example --admin-lastname=Example --use-rewrites=1 && \
     php bin/magento deploy:mode:set developer && \
     php bin/magento setup:static-content:deploy en_US -f -j 12 && \
