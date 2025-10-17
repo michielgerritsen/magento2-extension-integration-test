@@ -79,6 +79,8 @@ Special thanks to Fooman for providing a Magento 2 mirror that does not requires
 
 ## Version matrix
 
+View [Mage-OS versions](#mage-os-versions) below.
+
 | Magento version | PHP 8.4 | PHP 8.3 | PHP 8.2 | PHP 8.1 | PHP 7.4 | PHP 7.3 | PHP 7.2 |
 |-----------------|---------|---------|---------|---------|---------|---------|---------|
 | 2.4.9-alpha3    | x       | x       | -       | -       | -       | -       | -       |
@@ -162,3 +164,21 @@ Special thanks to Fooman for providing a Magento 2 mirror that does not requires
 | 2.3.2           | -       | -       | -       | -       | -       | -       | x       |
 | 2.3.1           | -       | -       | -       | -       | -       | -       | x       |
 | 2.3.0           | -       | -       | -       | -       | -       | -       | x       |
+
+
+# Mage-OS Versions
+| Mage-OS Version | PHP 8.4 | PHP 8.3 | PHP 8.2 |
+|-----------------|---------|---------|---------|
+| 2.0.0           | x       | x       | -       |
+| 1.3.1           | -       | x       | -       |
+| 1.3.0           | -       | x       | -       |
+| 1.2.0           | -       | x       | -       |
+| 1.1.1           | -       | x       | -       |
+| 1.1.0           | -       | x       | -       |
+| 1.0.6           | -       | x       | -       |
+| 1.0.5           | -       | x       | -       |
+| 1.0.4           | -       | x       | -       |
+| 1.0.3           | -       | x       | -       |
+| 1.0.2           | -       | x       | -       |
+| 1.0.1           | -       | -       | x       |
+| 1.0.0           | -       | -       | x       |
