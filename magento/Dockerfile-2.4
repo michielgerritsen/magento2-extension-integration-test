@@ -41,7 +41,7 @@ RUN set -e; \
     if [ "$MAGENTO_VERSION" = "2.4.4" ]; then composer require "magento/security-package:1.1.3-p1 as 1.1.3" --no-update; fi && \
     if [ "$MAGENTO_VERSION" = "2.4.4" ]; then composer require "magento/inventory-metapackage:1.2.4-p1 as 1.2.4" --no-update; fi && \
     echo "[cad] Running Composer install" && \
-    ./retry "composer install --no-security-blocking" && \
+    ./retry "composer update --no-security-blocking" && \
     php scripts/patch-AC2855.php && \
     php scripts/downgrade-monolog.php && \
     php scripts/remove-paypal-braintree.php && \

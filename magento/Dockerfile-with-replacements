@@ -27,7 +27,7 @@ RUN set -e; \
     rm scripts/allow-composer-plugins.php && \
     composer config --unset repositories.0 && \
     composer config repositories.mageos composer https://mirror.mage-os.org/ && \
-    ./retry "composer install --no-security-blocking" && \
+    ./retry "composer update --no-security-blocking" && \
     composer config --no-plugins allow-plugins.yireo/magento2-replace-tools true && \
     ./retry "composer require --dev yireo/magento2-replace-tools --with-dependencies" && \
     ./retry "composer replace:bulk:add yireo/magento2-replace-all" && \
