@@ -19,7 +19,7 @@ RUN set -e; \
     echo "[cad] Composer version:" && \
     composer --version && \
     echo "[cad] Downloading & unzipping Magento" && \
-    curl --fail-with-body -o magento.zip https://mirror.mage-os.org/build/packages/magento/$MAGENTO_TYPE-$MAGENTO_VERSION.zip && \
+    curl --fail-with-body -o magento.zip https://mirror.mage-os.org/packages/magento/$MAGENTO_TYPE-$MAGENTO_VERSION.zip && \
     unzip -q magento.zip -d . && \
     rm magento.zip && \
     echo "[cad] Allowing composer plugins" && \
