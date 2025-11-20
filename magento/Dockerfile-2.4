@@ -27,18 +27,10 @@ RUN set -e; \
     composer self-update --2 && \
     echo "[cad] Composer version:" && \
     composer --version && \
-    if [ "$MAGENTO_VERSION" = "2.4.9-alpha3" ]; then \
-        echo "[cad] Downloading Magento" && \
-        composer create-project --repository-url=https://repo.magento.com/ magento/$MAGENTO_TYPE=$MAGENTO_VERSION build && \
-        mv build/* . && \
-        for f in build/.*; do [ "$f" != "build/." ] && [ "$f" != "build/.." ] && mv "$f" .; done && \
-        rm -rf build; \
-    else \
-        echo "[cad] Downloading & unzipping Magento" && \
-        curl --fail-with-body -o magento.zip https://repo-magento-mirror.fooman.co.nz/dist/magento/$MAGENTO_TYPE/magento-$MAGENTO_TYPE-$MAGENTO_VERSION.zip && \
-        unzip -q magento.zip -d . && \
-        rm magento.zip; \
-    fi && \
+    echo "[cad] Downloading & unzipping Magento" && \
+    curl --fail-with-body -o magento.zip https://mirror.mage-os.org/build/packages/magento/$MAGENTO_TYPE-$MAGENTO_VERSION.zip && \
+    unzip -q magento.zip -d . && \
+    rm magento.zip; \
     echo "[cad] Allowing composer plugins" && \
     php scripts/allow-composer-plugins.php && \
     rm scripts/allow-composer-plugins.php && \
@@ -47,7 +39,7 @@ RUN set -e; \
     rm scripts/upgrade-to-composer-2.php && \
     if [ "$MAGENTO_VERSION" != "2.4.9-alpha3" ]; then \
         composer config --unset repositories.0 && \
-        composer config repositories.fooman composer https://repo-magento-mirror.fooman.co.nz/; \
+        composer config repositories.mageos composer https://mirror.mage-os.org/; \
     fi && \
     if [ "$MAGENTO_VERSION" = "2.4.4" ]; then composer require "magento/security-package:1.1.3-p1 as 1.1.3" --no-update; fi && \
     if [ "$MAGENTO_VERSION" = "2.4.4" ]; then composer require "magento/inventory-metapackage:1.2.4-p1 as 1.2.4" --no-update; fi && \

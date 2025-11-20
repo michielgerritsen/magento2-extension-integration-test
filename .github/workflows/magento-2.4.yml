@@ -8,8 +8,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      COMPOSER_AUTH: ${{ secrets.COMPOSER_AUTH }}
     strategy:
       fail-fast: false
       matrix:
@@ -261,7 +259,6 @@ jobs:
       run:
         docker build magento -f magento/Dockerfile-2.4
         -t michielgerritsen/magento-project-community-edition:${{ matrix.cfg.PHP_VERSION }}-magento${{ matrix.cfg.MAGENTO_VERSION }}
-        --build-arg COMPOSER_AUTH="$COMPOSER_AUTH"
         --build-arg MAGENTO_VERSION=${{ matrix.cfg.MAGENTO_VERSION }}
         --build-arg PHP_VERSION=${{ matrix.cfg.PHP_VERSION }}
 
@@ -270,7 +267,6 @@ jobs:
       run:
         docker build magento -f magento/Dockerfile-2.4
         -t michielgerritsen/magento-project-community-edition:${{ matrix.cfg.PHP_VERSION }}-magento${{ matrix.cfg.MAGENTO_VERSION }}-sample-data
-        --build-arg COMPOSER_AUTH="$COMPOSER_AUTH"
         --build-arg MAGENTO_VERSION=${{ matrix.cfg.MAGENTO_VERSION }}
         --build-arg PHP_VERSION=${{ matrix.cfg.PHP_VERSION }}
         --build-arg SAMPLE_DATA=true
