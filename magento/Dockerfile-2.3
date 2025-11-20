@@ -12,7 +12,6 @@ ENV FLAT_TABLES=false
 
 COPY scripts/retry retry
 COPY scripts/install-phpstan.php scripts/install-phpstan.php
-COPY scripts/upgrade-to-composer-2.php scripts/upgrade-to-composer-2.php
 COPY scripts/allow-composer-plugins.php scripts/allow-composer-plugins.php
 COPY patches/vertex-compilation-issue.patch vertex-compilation-issue.patch
 COPY patches/APSB22-12/MDVA-43395_EE_2.4.3-p1_COMPOSER_v1.patch MDVA-43395_EE_2.4.3-p1_COMPOSER_v1.patch
@@ -32,12 +31,10 @@ RUN ./start-services && \
     php scripts/allow-composer-plugins.php && \
     rm scripts/allow-composer-plugins.php && \
     echo "[cad] Upgrading to composer 2" && \
-    php scripts/upgrade-to-composer-2.php && \
-    rm scripts/upgrade-to-composer-2.php && \
     composer config --unset repositories.0 && \
     composer config repositories.mageos composer https://mirror.mage-os.org/ && \
     echo "[cad] Running Composer install" && \
-    ./retry "composer install" && \
+    ./retry "composer install --no-security-blocking" && \
     echo "[cad] Updating XML" && \
     if [ -f "/data/vendor/magento/module-inventory-catalog/etc/communication.xml" ]; then sed -i 's/is_synchronous="false"//g' /data/vendor/magento/module-inventory-catalog/etc/communication.xml; fi && \
     if [ -f "/data/vendor/magento/module-inventory-sales/etc/communication.xml" ]; then sed -i 's/is_synchronous="false"//g' /data/vendor/magento/module-inventory-sales/etc/communication.xml; fi && \

@@ -16,7 +16,6 @@ COPY scripts/retry retry
 COPY patches/ patches/
 COPY scripts/apply-2.4-patches.php scripts/apply-2.4-patches.php
 COPY scripts/downgrade-monolog.php scripts/downgrade-monolog.php
-COPY scripts/upgrade-to-composer-2.php scripts/upgrade-to-composer-2.php
 COPY scripts/allow-composer-plugins.php scripts/allow-composer-plugins.php
 COPY scripts/remove-paypal-braintree.php scripts/remove-paypal-braintree.php
 COPY scripts/patch-AC2855.php scripts/patch-AC2855.php
@@ -35,8 +34,6 @@ RUN set -e; \
     php scripts/allow-composer-plugins.php && \
     rm scripts/allow-composer-plugins.php && \
     echo "[cad] Upgrading to composer 2" && \
-    php scripts/upgrade-to-composer-2.php && \
-    rm scripts/upgrade-to-composer-2.php && \
     if [ "$MAGENTO_VERSION" != "2.4.9-alpha3" ]; then \
         composer config --unset repositories.0 && \
         composer config repositories.mageos composer https://mirror.mage-os.org/; \
@@ -44,7 +41,7 @@ RUN set -e; \
     if [ "$MAGENTO_VERSION" = "2.4.4" ]; then composer require "magento/security-package:1.1.3-p1 as 1.1.3" --no-update; fi && \
     if [ "$MAGENTO_VERSION" = "2.4.4" ]; then composer require "magento/inventory-metapackage:1.2.4-p1 as 1.2.4" --no-update; fi && \
     echo "[cad] Running Composer install" && \
-    ./retry "composer install" && \
+    ./retry "composer install --no-security-blocking" && \
     php scripts/patch-AC2855.php && \
     php scripts/downgrade-monolog.php && \
     php scripts/remove-paypal-braintree.php && \
