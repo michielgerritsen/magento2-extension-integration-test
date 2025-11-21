@@ -25,9 +25,10 @@ RUN set -e; \
     echo "[cad] Allowing composer plugins" && \
     php scripts/allow-composer-plugins.php && \
     rm scripts/allow-composer-plugins.php && \
-    composer config --unset repositories.0 && \
-    composer config repositories.fooman composer https://repo-magento-mirror.fooman.co.nz/ && \
-    ./retry "composer install" && \
+    tmp=$(mktemp) && jq 'del(.repositories)' composer.json > "$tmp" && mv "$tmp" composer.json && \
+    composer repo add fooman composer https://repo-magento-mirror.fooman.co.nz/ && \
+    echo "[cad] Running Composer update" && \
+    ./retry "composer update --no-security-blocking" && \
     composer config --no-plugins allow-plugins.yireo/magento2-replace-tools true && \
     ./retry "composer require --dev yireo/magento2-replace-tools --with-dependencies" && \
     ./retry "composer replace:bulk:add yireo/magento2-replace-all" && \

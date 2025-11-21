@@ -34,10 +34,10 @@ RUN ./start-services && \
     echo "[cad] Upgrading to composer 2" && \
     php scripts/upgrade-to-composer-2.php && \
     rm scripts/upgrade-to-composer-2.php && \
-    composer config --unset repositories.0 && \
-    composer config repositories.fooman composer https://repo-magento-mirror.fooman.co.nz/ && \
-    echo "[cad] Running Composer install" && \
-    ./retry "composer install" && \
+    tmp=$(mktemp) && jq 'del(.repositories)' composer.json > "$tmp" && mv "$tmp" composer.json && \
+    composer repo add fooman composer https://repo-magento-mirror.fooman.co.nz/ && \
+    echo "[cad] Running Composer update" && \
+    ./retry "composer update --no-security-blocking" && \
     echo "[cad] Updating XML" && \
     if [ -f "/data/vendor/magento/module-inventory-catalog/etc/communication.xml" ]; then sed -i 's/is_synchronous="false"//g' /data/vendor/magento/module-inventory-catalog/etc/communication.xml; fi && \
     if [ -f "/data/vendor/magento/module-inventory-sales/etc/communication.xml" ]; then sed -i 's/is_synchronous="false"//g' /data/vendor/magento/module-inventory-sales/etc/communication.xml; fi && \

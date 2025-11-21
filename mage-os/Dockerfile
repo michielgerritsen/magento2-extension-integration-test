@@ -21,7 +21,8 @@ RUN set -e; \
     echo "[cad] Composer version:" && \
     composer --version && \
     echo "[cad] Downloading & unzipping Magento" && \
-    composer create-project --repository-url=https://repo.mage-os.org/ mage-os/project-community-edition:"$MAGEOS_VERSION" /tmp/mage-os && \
+    composer create-project --repository-url=https://repo.mage-os.org/ mage-os/project-community-edition:"$MAGEOS_VERSION" /tmp/mage-os --no-install && \
+    (cd /tmp/mage-os && COMPOSER_NO_SECURITY_BLOCKING=1 composer update --no-security-blocking) && \
     rsync -a /tmp/mage-os/ /data/ && \
     echo "[cad] Allowing composer plugins" && \
     php scripts/allow-composer-plugins.php && \
