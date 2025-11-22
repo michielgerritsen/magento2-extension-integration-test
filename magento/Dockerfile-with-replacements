@@ -30,10 +30,11 @@ RUN set -e; \
     echo "[cad] Running Composer update" && \
     ./retry "composer update --no-security-blocking" && \
     composer config --no-plugins allow-plugins.yireo/magento2-replace-tools true && \
-    ./retry "composer require --dev yireo/magento2-replace-tools --with-dependencies" && \
+    ./retry "composer require --dev yireo/magento2-replace-tools --no-install" && \
+    ./retry "composer update --dev yireo/magento2-replace-tools --no-security-blocking --with-all-dependencies" && \
     ./retry "composer replace:bulk:add yireo/magento2-replace-all" && \
     ./retry "composer replace:build" && \
-    ./retry "composer update --lock" && \
+    ./retry "composer update --lock --no-security-blocking" && \
     if [ -f "/data/vendor/magento/module-inventory-catalog/etc/communication.xml" ]; then sed -i 's/is_synchronous="false"//g' /data/vendor/magento/module-inventory-catalog/etc/communication.xml; fi && \
     if [ -f "/data/vendor/magento/module-inventory-sales/etc/communication.xml" ]; then sed -i 's/is_synchronous="false"//g' /data/vendor/magento/module-inventory-sales/etc/communication.xml; fi && \
     if [ -f "/data/vendor/magento/module-inventory-indexer/etc/communication.xml" ]; then sed -i 's/is_synchronous="false"//g' /data/vendor/magento/module-inventory-indexer/etc/communication.xml; fi && \

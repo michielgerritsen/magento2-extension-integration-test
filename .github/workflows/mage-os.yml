@@ -49,6 +49,7 @@ jobs:
       run:
         docker build mage-os -f mage-os/Dockerfile
         -t michielgerritsen/mage-os-community-edition:${{ matrix.cfg.PHP_VERSION }}-mage-os${{ matrix.cfg.MAGEOS_VERSION }}
+        -t ghcr.io/${{ github.repository }}/mage-os-community-edition:${{ matrix.cfg.PHP_VERSION }}-mage-os${{ matrix.cfg.MAGENTO_VERSION }}
         --build-arg MAGEOS_VERSION=${{ matrix.cfg.MAGEOS_VERSION }}
         --build-arg PHP_VERSION=${{ matrix.cfg.PHP_VERSION }}
 
@@ -57,6 +58,7 @@ jobs:
       run:
         docker build mage-os -f mage-os/Dockerfile
         -t michielgerritsen/mage-os-community-edition:${{ matrix.cfg.PHP_VERSION }}-mage-os${{ matrix.cfg.MAGEOS_VERSION }}-sample-data
+        -t ghcr.io/${{ github.repository }}/mage-os-community-edition:${{ matrix.cfg.PHP_VERSION }}-mage-os${{ matrix.cfg.MAGENTO_VERSION }}-sample-data
         --build-arg MAGEOS_VERSION=${{ matrix.cfg.MAGEOS_VERSION }}
         --build-arg PHP_VERSION=${{ matrix.cfg.PHP_VERSION }}
         --build-arg SAMPLE_DATA=true
@@ -92,18 +94,30 @@ jobs:
     - name: Install the example test module
       run: docker exec mage-os-community-edition composer require michielgerritsen/exampletest:@dev
 
-    # Step 3: Upload the images to Docker Hub.
-    - name: Docker hub login
-      if: github.ref == 'refs/heads/master'
-      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+    # Step 3: Upload the images to Docker Hub and ghcr.io.
+    - name: Push the image to GitHub Container Registry (without sample data)
+      if: github.ref == 'refs/heads/master' && matrix.cfg.SAMPLE_DATA == false
+      run: |
+        echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+        docker push ghcr.io/${{ github.repository }}/mage-os-community-edition:${{ matrix.cfg.PHP_VERSION }}-mage-os${{ matrix.cfg.MAGENTO_VERSION }}
+
+    - name: Push the image to GitHub Container Registry  (with sample data)
+      if: github.ref == 'refs/heads/master' && matrix.cfg.SAMPLE_DATA == true
+      run: |
+        echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+        docker push ghcr.io/${{ github.repository }}/mage-os-community-edition:${{ matrix.cfg.PHP_VERSION }}-mage-os${{ matrix.cfg.MAGENTO_VERSION }}-sample-data
 
     - name: Push the image to Docker hub (without sample data)
       if: github.ref == 'refs/heads/master' && matrix.cfg.SAMPLE_DATA == false
-      run: docker push michielgerritsen/mage-os-community-edition:${{ matrix.cfg.PHP_VERSION }}-mage-os${{ matrix.cfg.MAGEOS_VERSION }}
+      run: |
+        echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+        docker push michielgerritsen/mage-os-community-edition:${{ matrix.cfg.PHP_VERSION }}-mage-os${{ matrix.cfg.MAGEOS_VERSION }}
 
     - name: Push the image to Docker hub (with sample data)
       if: github.ref == 'refs/heads/master' && matrix.cfg.SAMPLE_DATA == true
-      run: docker push michielgerritsen/mage-os-community-edition:${{ matrix.cfg.PHP_VERSION }}-mage-os${{ matrix.cfg.MAGEOS_VERSION }}-sample-data
+      run: |
+        echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+        docker push michielgerritsen/mage-os-community-edition:${{ matrix.cfg.PHP_VERSION }}-mage-os${{ matrix.cfg.MAGEOS_VERSION }}-sample-data
 
     - name: Dump Docker logs files (on failure)
       if: failure()
